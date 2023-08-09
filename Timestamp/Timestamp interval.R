@@ -1,5 +1,3 @@
-file007 = read.table("file007.txt",sep = ",",header = FALSE)
-
 # Set the file path
 file_path <- "file007.txt"  # Replace with the actual path to your file
 
@@ -26,3 +24,4 @@ timestamp_diffs <- diff(timestamps)
 plot(1:(length(timestamp_diffs)+1), timestamps, type = "o", 
      xlab = "Timestamp Index", ylab = "Timestamp",
      main = "Consistency of Timestamp Intervals")
+
