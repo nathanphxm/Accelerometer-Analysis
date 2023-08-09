@@ -40,17 +40,24 @@ void update_timestamps(const char *filename, time_t gps_timestamp, time_t file_t
     }
 
     char output_filename[256];
+    char gps_filename[256];
     char *dot = strrchr(filename, '.');
     if (dot) {
         snprintf(output_filename, dot - filename + 1, "%s", filename);
         strcat(output_filename, "_clean");
         strcat(output_filename, dot);
+
+        snprintf(gps_filename, dot - filename + 1, "%s", filename);
+        strcat(gps_filename, "_gps");
+        strcat(gps_filename, dot);
     } else {
         snprintf(output_filename, sizeof(output_filename), "%s_clean", filename);
+        snprintf(gps_filename, sizeof(gps_filename), "%s_gps", filename);
     }
 
     FILE *output_file = fopen(output_filename, "w");
-    if (output_file == NULL) {
+    FILE *gps_file = fopen(gps_filename, "w");
+    if (output_file == NULL || gps_file == NULL) {
         perror("Error opening output file");
         fclose(input_file);
         return;
@@ -58,15 +65,21 @@ void update_timestamps(const char *filename, time_t gps_timestamp, time_t file_t
 
     char line[256];
     time_t timestamp_diff = gps_timestamp - file_timestamp;
+    time_t current_timestamp = 0;
     while (fgets(line, sizeof(line), input_file)) {
         if (line[0] == '*') {
             time_t original_timestamp;
             sscanf(line, "*%ld", &original_timestamp);
-            time_t updated_timestamp = original_timestamp + timestamp_diff;
-            fprintf(output_file, "*%ld\n", updated_timestamp);
+            current_timestamp = original_timestamp + timestamp_diff;
+            fprintf(output_file, "*%ld\n", current_timestamp);
         } else {
             int x, y, z;
-            if (sscanf(line, "%d,%d,%d", &x, &y, &z) == 3 && (x != 0 || y != 0 || z != 0)) {
+            double lat, lon;
+            int day, month, year, hour, minute, second;
+            if (sscanf(line, "%d,%d,%d,%lf,%lf,%d,%d,%d,%d,%d,%d", &x, &y, &z, &lat, &lon, &day, &month, &year, &hour, &minute, &second) == 11) {
+                // Write GPS data to gps_file
+                fprintf(gps_file, "%ld,%lf,%lf\n", current_timestamp, lat, lon);
+            } else if (sscanf(line, "%d,%d,%d", &x, &y, &z) == 3 && (x != 0 || y != 0 || z != 0)) {
                 fprintf(output_file, "%d,%d,%d\n", x, y, z);
             }
         }
@@ -74,8 +87,11 @@ void update_timestamps(const char *filename, time_t gps_timestamp, time_t file_t
 
     fclose(input_file);
     fclose(output_file);
+    fclose(gps_file);
     printf("Updated file written to %s\n", output_filename);
+    printf("GPS data written to %s\n", gps_filename);
 }
+
 
 int main(int argc, char *argv[]) {
     if (argc != 2) {
