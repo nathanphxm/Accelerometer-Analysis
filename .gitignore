@@ -1,3 +1,4 @@
 /resources/*_clean.txt
 /resources/*_gps.txt
 *.exe
+.DS_Store
