@@ -34,14 +34,8 @@ def process_file(file_path):
     return proc_data
 
         
-def main():
-    if len(sys.argv) != 2:
-        print("Usage: script.py <file.txt>")
-        return
-    
-    file_path = sys.argv[1]
+def main(file_path):
     file_name = file_path.split('/')[-1].split('.')[0]
-    
     pd = process_file(file_path)
     
     with open(f'../resources/{file_name}_processed.csv', 'w') as pf:
@@ -52,3 +46,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+    
