@@ -44,7 +44,7 @@ def main():
     
     pd = process_file(file_path)
     
-    with open(f'../resources/{file_name}_processed.txt', 'w') as pf:
+    with open(f'../resources/{file_name}_processed.csv', 'w') as pf:
         for line in pd:
             pf.write(line)
 

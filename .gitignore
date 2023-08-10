@@ -1,4 +1,4 @@
 /resources/*_clean.txt
 /resources/*_gps.txt
-/resources/*_processed.txt
+/resources/*_processed.csv
 *.exe
