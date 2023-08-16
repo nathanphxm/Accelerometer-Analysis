@@ -76,3 +76,39 @@ def frequency_x_per_day():
 
 #frequency_x_per_day()
 #read_file('./resources/file007_clean.txt')
+
+def frequency_y_per_hour(hr):
+    data = get_hour_data(hr)
+    previous_y = None
+    frequency = 0
+    for line in data[1:]:
+        if previous_y is None:
+            previous_y = int(line[3])
+        elif abs(int(line[3]) - int(previous_y)) >= 10:
+            frequency += 1
+        previous_y = line[3]
+    return frequency
+
+def frequency_y_per_day():
+    y_frequency = [["Hour","Frequency of movement in y-axis"]]
+    for hr in range(25):
+        y_frequency.append([hr,frequency_y_per_hour(hr)])
+    return y_frequency
+
+def frequency_z_per_hour(hr):
+    data = get_hour_data(hr)
+    previous_z = None
+    frequency = 0
+    for line in data[1:]:
+        if previous_z is None:
+            previous_z = int(line[4])
+        elif abs(int(line[4]) - int(previous_z)) >= 10:
+            frequency += 1
+        previous_z = line[4]
+    return frequency
+
+def frequency_z_per_day():
+    z_frequency = [["Hour","Frequency of movement in z-axis"]]
+    for hr in range(25):
+        z_frequency.append([hr,frequency_z_per_hour(hr)])
+    return z_frequency
