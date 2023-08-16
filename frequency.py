@@ -52,8 +52,8 @@ def get_hour_data(hour):
     #print(this_hour_data)
     return this_hour_data
 
-def frequency_x_per_hour():
-    data = get_hour_data(hour)
+def frequency_x_per_hour(hr):
+    data = get_hour_data(hr)
     previous_x = None
     frequency = 0
     for line in data[1:]:
@@ -64,10 +64,15 @@ def frequency_x_per_hour():
         previous_x = line[2]
     #print(data[0:10])
     #print(previous_x)
-    print(hour,':00', "frequency of movement",frequency)
+    #print(hour,':00', "frequency of movement",frequency)
     return frequency
 
-#def frequency_x_per_day():
-#    for hr in range(24)
-#frequency_x_per_hour()
+def frequency_x_per_day():
+    x_frequency = [["Hour","Frequency of movement in x-axis"]]
+    for hr in range(25):
+        x_frequency.append([hr,frequency_x_per_hour(hr)])
+    #print(x_frequency)
+    return x_frequency
+
+#frequency_x_per_day()
 #read_file('./resources/file007_clean.txt')
