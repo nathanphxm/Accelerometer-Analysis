@@ -92,7 +92,7 @@ def acceleration_grapher(filename, header = False, calibrate_x = [-1.0,1.0], cal
     plt.xlabel("Timestamp (s)")
     plt.ylabel("Acceleration (g)")
     # Y-axis label for uncalibrated data
-    if calibrate_x == [0.0,1.0] or calibrate_y == [0.0,1.0] or calibrate_z == [0.0,1.0]:
+    if calibrate_x == [-1.0,1.0] or calibrate_y == [-1.0,1.0] or calibrate_z == [-1.0,1.0]:
         plt.ylabel("Acceleration (units/s^2)")
     plt.show()
     return plt
