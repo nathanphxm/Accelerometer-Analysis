@@ -44,7 +44,7 @@ def timestamp_to_seconds(times):
     '''Returns time in milliseconds, given a numpy array of seconds and milliseconds'''
     return 1000 * times[0] + times[1]
 
-def acceleration_grapher(filename, header = False, calibrate_x = [0.0,1.0], calibrate_y = [0.0,1.0], calibrate_z = [0.0,1.0]):
+def acceleration_grapher(filename, header = False, calibrate_x = [-1.0,1.0], calibrate_y = [-1.0,1.0], calibrate_z = [-1.0,1.0]):
     """Returns an acceleration line graph pyplot object, given a file of sheep accelerometer data
     
     @param: calibrate_x a list of size 2 with a calibration lower bound and upper bound 
@@ -83,12 +83,9 @@ def acceleration_grapher(filename, header = False, calibrate_x = [0.0,1.0], cali
     extend_x_axis = np.linspace(timestamp_to_seconds(timestamp), timestamp_to_seconds(timestamp) + 1, FREQUENCY - zero_line_count)
     time_x_axis = np.append(time_x_axis, np.delete(extend_x_axis, 0))
     # Calibrates x,y,z accelerometer units into gravity units
-    x_origin = (calibrate_x[0] + calibrate_x[1])/2
-    y_origin = (calibrate_x[0] + calibrate_x[1])/2
-    z_origin = (calibrate_x[0] + calibrate_x[1])/2
-    x_acceleration = 2 * (x_acceleration - x_origin) / (calibrate_x[1] - calibrate_x[0])
-    y_acceleration = 2 * (y_acceleration - y_origin) / (calibrate_y[1] - calibrate_y[0])
-    z_acceleration = 2 * (z_acceleration - z_origin) / -(calibrate_z - calibrate_z)
+    x_acceleration = (2 * x_acceleration - calibrate_x[0] - calibrate_x[1]) / (calibrate_x[1] - calibrate_x[0])
+    y_acceleration = (2 * y_acceleration - calibrate_y[0] - calibrate_y[1]) / (calibrate_y[1] - calibrate_y[0])
+    z_acceleration = (2 * z_acceleration - calibrate_z[0] - calibrate_z[1]) / -(calibrate_z[1] - calibrate_z[0])
     net_acceleration = np.sqrt(x_acceleration ** 2 + y_acceleration ** 2 + z_acceleration ** 2)
     plt.plot(time_x_axis, net_acceleration)
     plt.title(f"Acceleration for {filename}")
