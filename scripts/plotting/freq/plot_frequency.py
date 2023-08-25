@@ -1,6 +1,6 @@
 import plotly.express as px
 import plotly.graph_objects as go
-import frequency
+import scripts.plotting.freq.frequency as frequency
 
 axes = [frequency.frequency_x_per_day(),frequency.frequency_y_per_day(),frequency.frequency_z_per_day()]
 axes_name = ['x','y','z']
