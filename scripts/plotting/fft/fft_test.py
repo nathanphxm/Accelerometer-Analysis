@@ -14,7 +14,7 @@ def plot_fft(time, axis, sample_rate, direction, ax):
     ax.set_xlim(0, 100)
 
 def plot_graph():
-    with open('./resources/file007_clean.txt', 'r') as file:
+    with open('./sample_data/file007_clean.txt', 'r') as file:
         lines = file.readlines()
 
     times, xs, ys, zs = [], [], [], []
