@@ -5,7 +5,7 @@ def parse_timestamp(unix_timestamp):
     return timestamp.year, timestamp.month, timestamp.day, timestamp.hour, timestamp.minute, timestamp.second
 
 def read_file(filename):
-    formatted_data = [['Year', 'Month', 'Day', 'Hour', 'Minutes','Seconds', 'Index', 'X', 'Y', 'Z']]
+    formatted_data = [['Year', 'Month', 'Day', 'Hour', 'Minutes', 'Seconds', 'Index', 'X', 'Y', 'Z']]
     
     with open(filename, 'r') as file:
         lines = file.readlines()
@@ -31,52 +31,53 @@ def get_filtered_data(month, day=None, hour=None, minute=None, second=None):
     
     return filtered_data
 
-def calculate_frequency(data, axis_idx):
+def calculate_frequency(data):
     frequency = 0
-    previous_value = None
+    previous_values = [None, None, None]
     
     for line in data[1:]:
-        value = int(line[axis_idx])
+        values = [int(value) for value in line[1:4]]  # X, Y, Z values
         
-        if previous_value is None:
-            previous_value = value
-        elif abs(value - previous_value) >= 10:
-            frequency += 1
-        previous_value = value
+        if None in previous_values:
+            previous_values = values
+        else:
+            if any(abs(values[i] - previous_values[i]) >= 10 for i in range(3)):
+                frequency += 1
+            previous_values = values
     
     return frequency
 
-def frequency_per_day_by_second(month, day, axis_idx):
+def frequency_per_day_by_second(month, day):
     frequencies = [["Time", "Frequency of movement"]]
     
     for hour in range(24):
         for minute in range(60):
             for second in range(60):
                 data = get_filtered_data(month, day, hour, minute, second)
-                frequency = calculate_frequency(data, axis_idx)  
+                frequency = calculate_frequency(data)  
                 time_str = f"{month}/{day} {hour:02d}:{minute:02d}:{second:02d}"
                 frequencies.append([time_str, frequency])
     
     return frequencies
 
-def frequency_per_day_by_minute(month, day, axis_idx):
+def frequency_per_day_by_minute(month, day):
     frequencies = [["Time", "Frequency of movement"]]
     
     for hour in range(24):
         for minute in range(60):
             data = get_filtered_data(month, day, hour, minute)
-            frequency = calculate_frequency(data, axis_idx)  
+            frequency = calculate_frequency(data)  
             time_str = f"{month}/{day} {hour:02d}:{minute:02d}"
             frequencies.append([time_str, frequency])
         print(frequencies)
     return frequencies
 
-def frequency_per_day_by_hour(month, day, axis_idx):
+def frequency_per_day_by_hour(month, day):
     frequencies = [["Hour", "Frequency of movement"]]
     
     for hour in range(24):
         data = get_filtered_data(month, day, hour)
-        frequency = calculate_frequency(data, axis_idx)
+        frequency = calculate_frequency(data)
         frequencies.append([hour, frequency])
     
     return frequencies
@@ -85,6 +86,9 @@ if __name__ == "__main__":
     month = 2
     day = 15
     
+    freq = frequency_per_day_by_minute(month, day)
+    print(freq)
+
     #x_frequencies = frequency_per_day_by_minute(month, day, 1)  # X-axis index
     #y_frequencies = frequency_per_day_by_minute(month, day, 2)  # Y-axis index
     #z_frequencies = frequency_per_day_by_minute(month, day, 3)  # Z-axis index
