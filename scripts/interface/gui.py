@@ -33,8 +33,7 @@ def run_gui():
     for subdir, _, files in os.walk(PLOTTING_DIR):
         for file in files:
             if file.endswith(".py") and file != "__init__.py":
-                relative_path = os.path.relpath(os.path.join(subdir, file), PLOTTING_DIR)
-                scripts.append(relative_path)
+                scripts.append(file)
 
     combobox['values'] = scripts
 
