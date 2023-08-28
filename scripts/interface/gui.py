@@ -1,52 +1,57 @@
 import os
 import sys
 import tkinter as tk
-from tkinter import filedialog, Listbox
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from tkinter import ttk  # For the Combobox widget
 import importlib
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 PLOTTING_DIR = os.path.join(os.path.dirname(__file__), "..", "plotting")
+
 
 def run_gui():
     global root
     root = tk.Tk()
-    
+
     # Maximizing the window based on the platform
     if sys.platform == "win32":
         root.state('zoomed')
     elif sys.platform == "linux" or sys.platform == "linux2":
         root.attributes('-zoomed', True)
     elif sys.platform == "darwin":
-        # For macOS, this will set the window size to 80% of the screen width and height
-        # Adjust these values if you want a different size.
         w, h = root.winfo_screenwidth() * 0.8, root.winfo_screenheight() * 0.8
         x, y = (root.winfo_screenwidth() - w) // 2, (root.winfo_screenheight() - h) // 2
         root.geometry(f"{int(w)}x{int(h)}+{int(x)}+{int(y)}")
 
     root.title("Graph Selection")
 
-    listbox = Listbox(root)
-    listbox.pack(pady=20, padx=20)
+    # Create a Combobox
+    combobox = ttk.Combobox(root)
+    combobox.pack(pady=20, padx=20)
 
-    # List all Python scripts from all subdirectories in the plotting folder
+    # Populate Combobox with Python scripts from all subdirectories in the plotting folder
+    scripts = []
     for subdir, _, files in os.walk(PLOTTING_DIR):
         for file in files:
             if file.endswith(".py") and file != "__init__.py":
                 relative_path = os.path.relpath(os.path.join(subdir, file), PLOTTING_DIR)
-                listbox.insert(tk.END, relative_path)
+                scripts.append(relative_path)
 
-    btn = tk.Button(root, text="Display Graph", command=lambda: display_graph(listbox))
+    combobox['values'] = scripts
+
+    btn = tk.Button(root, text="Display Graph", command=lambda: display_graph(combobox))
     btn.pack(pady=20)
 
     root.mainloop()
 
-def display_graph(listbox):
-    selected_file = listbox.get(tk.ACTIVE)
+
+current_canvas = None
+
+def display_graph(combobox):
+    global current_canvas
+    selected_file = combobox.get()
     if not selected_file:
         return
 
-    # Convert the file path to module path.
-    # E.g. "peaks/graph_test.py" -> "script.plotting.peaks.graph_test"
     module_path = "scripts.plotting." + selected_file.replace(os.sep, '.').rstrip('.py')
 
     # Dynamically import the module using the module path
@@ -54,11 +59,18 @@ def display_graph(listbox):
 
     fig = plot_module.plot_graph()
 
-    # Embed the figure in the tkinter window
+    # Remove the old canvas (if it exists)
+    if current_canvas:
+        current_canvas.get_tk_widget().destroy()
+        
+    # Embed the new figure in the tkinter window
     canvas = FigureCanvasTkAgg(fig, master=root)
     canvas_widget = canvas.get_tk_widget()
     canvas_widget.pack(side=tk.TOP, fill=tk.BOTH, expand=1)
     canvas.draw()
+
+    # Update current_canvas to hold a reference to the current canvas
+    current_canvas = canvas
 
 if __name__ == "__main__":
     run_gui()
