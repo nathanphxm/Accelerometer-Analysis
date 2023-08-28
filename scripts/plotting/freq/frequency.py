@@ -76,7 +76,6 @@ def get_second_data(month, day, hour, minute, second):
     #print(this_second_data)
     return this_second_data
 
-
 def frequency_x_per_hour(hr):
     data = get_hour_data(hr)
     previous_x = None
@@ -114,10 +113,9 @@ def frequency_x_per_hour_by_second(month, day):
     for min in range (60):
         for sc in range(60):
             x_frequency.append([str(month)+'/'+str(day)+' '+str(hour)+':'+str(min)+':'+str(sc),frequency_x_per_second(month, day, hour, min, sc)])
-    print(x_frequency)
+    #print(x_frequency)
     return x_frequency
 frequency_x_per_hour_by_second(month, day)
-
 
 def frequency_x_per_day():
     x_frequency = [["Hour","Frequency of movement in x-axis"]]
