@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 
 def plot_graph():
     # Read data from the specified text file
-    with open('./resources/file007_clean.txt', 'r') as file:
+    with open('./sample_data/file007_clean.txt', 'r') as file:
         lines = file.readlines()
 
     times, xs, ys, zs = [], [], [], []
