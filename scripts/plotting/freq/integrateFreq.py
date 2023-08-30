@@ -18,7 +18,7 @@ def read_file(filename):
     
     return formatted_data
 
-file_data = read_file('../../../resources/file007_clean.txt')
+file_data = read_file('../../../resources/file011_clean.txt')
 
 def get_filtered_data(month, day=None, hour=None, minute=None, second=None):
     filtered_data = [['Index', 'X', 'Y', 'Z']]
@@ -84,7 +84,7 @@ def frequency_per_day_by_hour(month, day):
 
 if __name__ == "__main__":
     month = 2
-    day = 15
+    day = 19
     
     freq = frequency_per_day_by_minute(month, day)
     print(freq)
