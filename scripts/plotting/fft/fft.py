@@ -6,7 +6,8 @@ from scipy.fftpack import fft,fftfreq
 with open('./resources/file007_clean.txt', 'r') as file:
     lines = file.readlines()
 
-times, xs, ys, zs = [], [], [], []
+times, xs, ys, zs, iter = [], [], [], [], []
+for_mean = []
 
 for line in lines:
     timestamp, iteration, x, y, z = map(int, line.split(","))
@@ -16,15 +17,14 @@ for line in lines:
     xs.append(x)
     ys.append(y)
     zs.append(z)
+    iter.append(iteration)
 
 # Convert timestamps to datetime objects
 datetimes = [datetime.utcfromtimestamp(ts) for ts in times]
 # Calculate the time difference between consecutive datetimes
 time_diff = (datetimes[-1] - datetimes[0]).total_seconds() / (len(datetimes) - 1)
-
 print(time_diff)
-# Calculate the sample rate as the inverse of the time difference
-sample_rate = 1 / time_diff
+
 sample = len(datetimes)
 
 def plot_fft(time,axis,sample_rate,direction):
@@ -64,8 +64,14 @@ def plot_fft2(axis):
 # plot_fft2(zs)
 
 #source: https://www.alphabold.com/fourier-transform-in-python-vibration-analysis/
-def fft_plot3(axis):
-    sample_rate = 25
+for i in range(len(iter)-1):
+    if(iter[i+1]<iter[i]):
+        for_mean.append(iter[i])
+
+
+avg_sample_rate = np.mean(for_mean)
+def fft_plot3(axis,direction):
+    sample_rate = avg_sample_rate
     total_second = (datetimes[-1] - datetimes[0]).total_seconds()
     N = sample_rate*total_second
     frequency = np.linspace(0.0, (sample_rate/2), int (N/2))
@@ -74,14 +80,14 @@ def fft_plot3(axis):
     y = 2/N * np.abs (freq_data [0: int(N/2)])
     #y = y - np.mean(y)
 
-    plt.plot(frequency[frequency>=0], y[frequency>=0])
+    plt.plot(frequency[frequency>0.4], y[frequency>0.4])
     plt.ylim(0,2)
-    plt.title('Frequency domain Signal')
+    plt.title('Frequency domain Signal of ' +direction)
     plt.xlabel('Frequency in Hz')
     plt.ylabel("Amplitude")
     plt.show()
 
-fft_plot3(xs)
-fft_plot3(ys)
-fft_plot3(zs)
+fft_plot3(xs,"x")
+fft_plot3(ys,"y")
+fft_plot3(zs,"z")
 # check: https://stackoverflow.com/questions/69356006/fast-fourier-transform-of-subset-of-vibration-dataset
