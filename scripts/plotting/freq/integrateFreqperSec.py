@@ -19,7 +19,7 @@ def read_file(filename):
     
     return formatted_data
 
-file_data = read_file('./resources/file011_clean.txt')
+file_data = read_file('../../../resources/file011_clean.txt')
 
 def get_filtered_data(month, day=None, start_hour=None, end_hour=None, start_minute=None, end_minute=None, start_second=None, end_second=None):
     filtered_data = [['Index', 'X', 'Y', 'Z']]
@@ -74,10 +74,3 @@ if __name__ == "__main__":
     
     data = frequency_per_day_by_second(month, day, start_hour, end_hour)
     print(data)
-
-    time = [entry[0] for entry in data[1:]]
-    freq = [entry[1] for entry in data[1:]]
-
-    fig = px.line(x=time, y=freq, title='Frequency of Movement (integrated)',labels={'x': 'Time', 'y': 'Frequency'}, template='plotly', width=1500, height=600)
-
-    fig.show()
