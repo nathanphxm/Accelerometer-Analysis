@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from datetime import datetime, timedelta
 from scipy.fftpack import fft,fftfreq
 
-def plot_fft(time, axis, sample_rate, direction, ax):
+def plot_fft(axis, sample_rate, direction, ax):
     transformed_axis = np.fft.fft(axis)
     freqs_magnitude = np.abs(transformed_axis)
     freq_axis = np.linspace(0, sample_rate, len(freqs_magnitude))
@@ -23,11 +23,11 @@ def plot_fft2(axis, total_second, direction, ax):
     y = 2/N * np.abs (freq_data [0: int(N/2)])
     #y = y - np.mean(y)
 
-    ax.plot(frequency[frequency>=0], y[frequency>=0])
-    ax.ylim(0,2)
-    ax.title('Frequency domain Signal of ' + direction)
-    ax.xlabel('Frequency in Hz')
-    ax.ylabel("Amplitude")
+    ax.plot(frequency[frequency>=0.2], y[frequency>=0.2])
+    ax.set_ylim(0,1)
+    ax.set_title('Frequency domain Signal of ' + direction)
+    ax.set_xlabel('Frequency in Hz')
+    ax.set_ylabel("Amplitude")
 
 def plot_graph():
     with open('./sample_data/file007_clean.txt', 'r') as file:

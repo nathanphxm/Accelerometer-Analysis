@@ -3,10 +3,11 @@ import matplotlib.pyplot as plt
 from datetime import datetime, timedelta
 from scipy.fftpack import fft,fftfreq
 
-with open('./resources/file007_clean.txt', 'r') as file:
+with open('./sample_data/file007_clean.txt', 'r') as file:
     lines = file.readlines()
 
 times, xs, ys, zs, iter = [], [], [], [], []
+magnitude = []
 for_mean = []
 
 for line in lines:
@@ -17,10 +18,12 @@ for line in lines:
     xs.append(x)
     ys.append(y)
     zs.append(z)
+    magnitude.append((x**2+y**2+z**2)**0.5)
     iter.append(iteration)
 
 # Convert timestamps to datetime objects
 datetimes = [datetime.utcfromtimestamp(ts) for ts in times]
+print(datetimes[0])
 # Calculate the time difference between consecutive datetimes
 time_diff = (datetimes[-1] - datetimes[0]).total_seconds() / (len(datetimes) - 1)
 print(time_diff)
@@ -81,13 +84,14 @@ def fft_plot3(axis,direction):
     #y = y - np.mean(y)
 
     plt.plot(frequency[frequency>0.4], y[frequency>0.4])
-    plt.ylim(0,2)
+    plt.ylim(0,1)
     plt.title('Frequency domain Signal of ' +direction)
     plt.xlabel('Frequency in Hz')
     plt.ylabel("Amplitude")
     plt.show()
 
-fft_plot3(xs,"x")
-fft_plot3(ys,"y")
-fft_plot3(zs,"z")
+# fft_plot3(xs,"x")
+# fft_plot3(ys,"y")
+# fft_plot3(zs,"z")
+# fft_plot3(magnitude,"total magnitude")
 # check: https://stackoverflow.com/questions/69356006/fast-fourier-transform-of-subset-of-vibration-dataset
