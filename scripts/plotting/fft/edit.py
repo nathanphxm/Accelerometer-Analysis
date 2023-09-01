@@ -26,8 +26,9 @@ datetimes = [datetime.utcfromtimestamp(ts) for ts in times]
 
 
 
-hour_to_find = 15
-indices = np.where([dt.hour == hour_to_find for dt in datetimes])[0]
+hour_start = 11
+hour_end = 13
+indices = np.where([dt.hour in range(hour_start,hour_end+1) for dt in datetimes])[0]
 filtered_datetimes = [datetimes[i] for i in indices]
 filtered_x = [xs[i] for i in indices]
 filtered_y = [ys[i] for i in indices]
@@ -42,8 +43,7 @@ for i in range(len(filtered_iter)-1):
 
 avg_sample_rate = np.mean(for_mean)
 
-def fft_plot3(axis,direction):
-    sample_rate = avg_sample_rate
+def fft_plot3(axis,datetimes,sample_rate,direction):
     total_second = (datetimes[-1] - datetimes[0]).total_seconds()
     N = sample_rate*total_second
     frequency = np.linspace(0.0, (sample_rate/2), int (N/2))
@@ -53,13 +53,13 @@ def fft_plot3(axis,direction):
     #y = y - np.mean(y)
 
     plt.plot(frequency[frequency>0.4], y[frequency>0.4])
-    plt.ylim(0,1)
+    plt.ylim(0,4)
     plt.title('Frequency domain Signal of ' +direction)
     plt.xlabel('Frequency in Hz')
     plt.ylabel("Amplitude")
     plt.show()
 
-fft_plot3(xs,"x")
-fft_plot3(ys,"y")
-fft_plot3(zs,"z")
-fft_plot3(magnitude,"total magnitude")
+fft_plot3(filtered_x,filtered_datetimes,avg_sample_rate,"x")
+fft_plot3(filtered_y,filtered_datetimes,avg_sample_rate,"y")
+fft_plot3(filtered_z,filtered_datetimes,avg_sample_rate,"z")
+fft_plot3(filtered_mag,filtered_datetimes,avg_sample_rate,"total magnitude")
