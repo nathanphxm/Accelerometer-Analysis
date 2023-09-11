@@ -143,6 +143,7 @@ ax = plt.gca()
 ax.xaxis.set_major_locator(mdates.MinuteLocator(interval=15))
 ax.xaxis.set_major_formatter(mdates.DateFormatter("%H:%M"))
 
+plt.xticks(rotation=90)
 plt.grid(False)
 
 # Display the plot
