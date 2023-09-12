@@ -19,9 +19,9 @@ def read_file(filename):
     return formatted_data
 
 #file_data = read_file('../../../resources/file011_clean.txt')
-file_data = read_file('../../../paddock_data/green131_gps0459_file011_clean.txt')
-# file_data = read_file('../../../paddock_data/pink69_gps0003_file011_clean.txt')
-# file_data = read_file('../../../paddock_data/yellow133_gps1098_file011_clean.txt')
+#file_data = read_file('../../../paddock_data/green131_gps0459_file011_clean.txt')
+#file_data = read_file('../../../paddock_data/pink181_gps1032_file011_clean.txt')
+file_data = read_file('../../../paddock_data/yellow133_gps1098_file011_clean.txt')
 
 print(file_data[:6])
 
