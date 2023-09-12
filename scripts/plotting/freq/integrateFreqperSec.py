@@ -50,7 +50,6 @@ def calculate_frequency(data):
     
     return frequency
 
-# Modify the frequency calculation functions to consider the specified time range
 def frequency_per_day_by_second(month, day, start_hour, end_hour):
     frequencies = [["Time", "Frequency of movement"]]
     
@@ -63,8 +62,6 @@ def frequency_per_day_by_second(month, day, start_hour, end_hour):
                 frequencies.append([time_str, frequency])
     
     return frequencies
-
-# Modify other frequency calculation functions similarly
 
 if __name__ == "__main__":
     month = 2

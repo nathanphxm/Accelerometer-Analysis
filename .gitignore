@@ -4,3 +4,4 @@
 /resources/*.zip
 __pycache__/
 *.exe
+venv

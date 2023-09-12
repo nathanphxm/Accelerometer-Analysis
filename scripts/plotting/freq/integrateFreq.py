@@ -18,7 +18,10 @@ def read_file(filename):
     
     return formatted_data
 
-file_data = read_file('../../../resources/file011_clean.txt')
+#file_data = read_file('../../../resources/file011_clean.txt')
+file_data = read_file('../../../paddock_data/green131_gps0459_file011_clean.txt')
+# file_data = read_file('../../../paddock_data/pink69_gps0003_file011_clean.txt')
+# file_data = read_file('../../../paddock_data/yellow133_gps1098_file011_clean.txt')
 
 def get_filtered_data(month, day=None, hour=None, minute=None, second=None):
     filtered_data = [['Index', 'X', 'Y', 'Z']]
@@ -91,25 +94,15 @@ if __name__ == "__main__":
 
     #x_frequencies = frequency_per_day_by_minute(month, day, 1)  # X-axis index
     #y_frequencies = frequency_per_day_by_minute(month, day, 2)  # Y-axis index
-    #z_frequencies = frequency_per_day_by_minute(month, day, 3)  # Z-axis index
-
-    # print("X-axis Frequencies per Day by minute:")
-    # for freq in x_frequencies:
-    #     print(freq)
-    
-    # print("Y-axis Frequencies per Day by minute:")
-    # for freq in y_frequencies:
-    #     print(freq)
-    
-    #print("Z-axis Frequencies per Day by minute:")
-    #print(z_frequencies)
-    # for freq in z_frequencies:
-    #     print(freq)
-    
+    #z_frequencies = frequency_per_day_by_minute(month, day, 3)  # Z-axis index    
 
     # x_frequencies = frequency_per_day_by_hour(month, day, 1)  # X-axis index
     # y_frequencies = frequency_per_day_by_hour(month, day, 2)  # Y-axis index
     # z_frequencies = frequency_per_day_by_hour(month, day, 3)  # Z-axis index
+
+    # x_frequencies = frequency_per_day_by_second(month, day, 1)  # X-axis index
+    # y_frequencies = frequency_per_day_by_second(month, day, 2)  # Y-axis index
+    # z_frequencies = frequency_per_day_by_second(month, day, 3)  # Z-axis index
 
     # print("X-axis Frequencies per Day")
     # for freq in x_frequencies:
@@ -123,19 +116,36 @@ if __name__ == "__main__":
     # for freq in z_frequencies:
     #     print(freq)
 
+import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
+from datetime import datetime
 
-    # x_frequencies = frequency_per_day_by_second(month, day, 1)  # X-axis index
-    # y_frequencies = frequency_per_day_by_second(month, day, 2)  # Y-axis index
-    # z_frequencies = frequency_per_day_by_second(month, day, 3)  # Z-axis index
+month = 2
+day = 19
+freq_data = frequency_per_day_by_minute(month, day)
 
-    # print("X-axis Frequencies per Day by second:")
-    # for freq in x_frequencies:
-    #     print(freq)
-    
-    # print("Y-axis Frequencies per Day by second:")
-    # for freq in y_frequencies:
-    #     print(freq)
-    
-    # print("Z-axis Frequencies per Day by second:")
-    # for freq in z_frequencies:
-    #     print(freq)
+# Extract x-axis (time) and y-axis (frequency) data
+time_str = [entry[0] for entry in freq_data[1:]]  # Skipping the header row
+frequency = [entry[1] for entry in freq_data[1:]]  # Skipping the header row
+
+# Convert time strings to datetime objects
+time = [datetime.strptime(ts, "%m/%d %H:%M") for ts in time_str]
+
+# Create a line plot
+plt.figure(figsize=(12, 6), facecolor='white')
+plt.plot(time, frequency, linestyle='-')
+plt.xlabel('Time')
+plt.ylabel('Frequency of Movement')
+plt.title(f'Frequency of Movement on {month}/{day} by Minute')
+
+# Format the x-axis to display time at 15-minute intervals
+ax = plt.gca()
+ax.xaxis.set_major_locator(mdates.MinuteLocator(interval=15))
+ax.xaxis.set_major_formatter(mdates.DateFormatter("%H:%M"))
+
+plt.xticks(rotation=90)
+plt.grid(False)
+
+# Display the plot
+plt.tight_layout()
+plt.show()
