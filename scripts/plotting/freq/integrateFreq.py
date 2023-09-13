@@ -19,9 +19,9 @@ def read_file(filename):
     return formatted_data
 
 #file_data = read_file('../../../resources/file011_clean.txt')
-file_data = read_file('../../../paddock_data/green131_gps0459_file011_clean.txt')
-# file_data = read_file('../../../paddock_data/pink69_gps0003_file011_clean.txt')
-# file_data = read_file('../../../paddock_data/yellow133_gps1098_file011_clean.txt')
+#file_data = read_file('../../../paddock_data/green131_gps0459_file011_clean.txt')
+file_data = read_file('../../../paddock_data/pink181_gps1032_file011_clean.txt')
+#file_data = read_file('../../../paddock_data/yellow133_gps1098_file011_clean.txt')
 
 def get_filtered_data(month, day=None, hour=None, minute=None, second=None):
     filtered_data = [['Index', 'X', 'Y', 'Z']]
@@ -142,6 +142,9 @@ plt.title(f'Frequency of Movement on {month}/{day} by Minute')
 ax = plt.gca()
 ax.xaxis.set_major_locator(mdates.MinuteLocator(interval=15))
 ax.xaxis.set_major_formatter(mdates.DateFormatter("%H:%M"))
+
+# Set the x-axis limits to 00:00 to 23:59
+plt.xlim(datetime(time[0].year, time[0].month, time[0].day, 0, 0), datetime(time[-1].year, time[-1].month, time[-1].day, 23, 59))
 
 plt.xticks(rotation=90)
 plt.grid(False)
