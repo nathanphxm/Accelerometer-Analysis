@@ -40,6 +40,6 @@ roll_deg = np.degrees(roll)
 print("Pitch angle (degrees):", pitch_deg[:10])
 print("Roll angle (degrees):", roll_deg[:10])
 # Convert timestamps to datetime objects
-datetimes = [datetime.utcfromtimestamp(ts) for ts in times]
+datetimes = [datetime.fromtimestamp(ts) for ts in times]
 
 
