@@ -14,9 +14,9 @@ def read_gps_file(filename):
     return formatted_data
 
 #gps_data = read_gps_file('../../../resources/file011_gps.txt')
-#gps_data = read_gps_file('../../../paddock_data/green131_gps0459_file011_gps.txt')
+gps_data = read_gps_file('../../../paddock_data/green131_gps0459_file011_gps.txt')
 #gps_data = read_gps_file('../../../paddock_data/pink181_gps1032_file011_gps.txt')
-gps_data = read_gps_file('../../../paddock_data/yellow133_gps1098_file011_gps.txt')
+#gps_data = read_gps_file('../../../paddock_data/yellow133_gps1098_file011_gps.txt')
 
 def get_filtered_data(month, day=None, hour=None, minute=None, second=None):
     filtered_data = []
