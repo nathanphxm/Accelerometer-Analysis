@@ -81,46 +81,33 @@ category_y = classify_activity(diff_y)
 category_z = classify_activity(diff_z)
 category_mag = classify_activity(diff_mag)
 
-fig, (ax1, ax2, ax3) = plt.subplots(3, 1, figsize=(6, 6))
+# Define colors for each category
+category_colors = {1: 'red', 2: 'green', 3: 'blue'}
 
-ax1.plot(forplot_datetime, diff_x)
-ax1.set_title('Changes in x-axis reading over time')
-ax1.set_ylabel('\u0394 X')
-ax1.xaxis.set_major_locator(mdates.MinuteLocator(interval=60))
-ax1.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M'))
-ax1.tick_params(axis='x', rotation=45)  # Rotate x-axis labels by 90 degrees
+# Create a scatter plot
+plt.figure(figsize=(8, 4))
+plt.scatter(forplot_datetime, diff_x, c=[category_colors[cat] for cat in category_x], marker='o', label='Category')
 
-# Plot changes in y-axis reading over time
-ax2.plot(forplot_datetime, diff_y)
-ax2.set_title('Changes in y-axis reading over time')
-ax2.set_ylabel('\u0394 Y')
-ax2.xaxis.set_major_locator(mdates.MinuteLocator(interval=60))
-ax2.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M'))
-ax2.tick_params(axis='x', rotation=45)  # Rotate x-axis labels by 90 degrees
+# Set plot labels and title
+plt.xlabel('Time')
+plt.ylabel('Change in X')
+plt.title('Scatter Plot with Category Colors')
 
-# Plot changes in z-axis reading over time
-ax3.plot(forplot_datetime, diff_z)
-ax3.set_title('Changes in z-axis reading over time')
-ax3.set_ylabel('\u0394 Z')
-ax3.xaxis.set_major_locator(mdates.MinuteLocator(interval=60))
-ax3.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M'))
-ax3.tick_params(axis='x', rotation=45)  # Rotate x-axis labels by 90 degrees
+# Customize x-axis date formatting
+plt.gca().xaxis.set_major_locator(mdates.MinuteLocator(interval=60))
+plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%H:%M'))
+plt.xticks(rotation=45)  # Rotate x-axis labels by 45 degrees
 
-# # Plot changes in magnitude over time
-# ax4.plot(forplot_datetime, diff_mag)
-# ax4.set_title('Changes in magnitude over time')
-# ax4.set_ylabel('\u0394 Magnitude')
-# ax4.xaxis.set_major_locator(mdates.MinuteLocator(interval=60))
-# ax4.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M'))
-# ax4.tick_params(axis='x', rotation=45)  # Rotate x-axis labels by 90 degrees
+# Set legend
+legend_labels = {1: 'Low Activity', 2: 'Medium Activity', 3: 'High Activity'}
+handles = [plt.Line2D([0], [0], marker='o', color='w', label=legend_labels[cat], markersize=8, markerfacecolor=color)
+           for cat, color in category_colors.items()]
+plt.legend(handles=handles, title='Categories')
 
-# Set the x-axis limits for all subplots (you can customize these limits)
 xmin = datetime(datetimes[0].year, datetimes[0].month, datetimes[0].day, 11, 0)
 xmax = datetime(datetimes[0].year, datetimes[0].month, datetimes[0].day, 12, 0)
-ax1.set_xlim(xmin, xmax)
-ax2.set_xlim(xmin, xmax)
-ax3.set_xlim(xmin, xmax)
-# ax4.set_xlim(xmin, xmax)
+plt.xlim(xmin, xmax)
 
+# Show the plot
 plt.tight_layout()
 plt.show()
