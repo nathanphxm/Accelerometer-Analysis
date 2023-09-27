@@ -95,9 +95,16 @@ plt.xlabel('Time')
 plt.ylabel('Frequency of Movement')
 plt.title(f'Frequency of Movement on {month}/{day} by Minute')
 
+# # Create a histogram
+# plt.figure(figsize=(12, 6), facecolor='white')
+# plt.hist(time, bins=len(time), weights=frequency, edgecolor='black', alpha=0.7)
+# plt.xlabel('Time')
+# plt.ylabel('Cumulative Frequency of Movement')
+# plt.title(f'Cumulative Frequency of Movement on {month}/{day} by Minute')
+
 # Format the x-axis to display time at 15-minute intervals
 ax = plt.gca()
-ax.xaxis.set_major_locator(mdates.MinuteLocator(interval=15))
+ax.xaxis.set_major_locator(mdates.HourLocator(interval=1))
 ax.xaxis.set_major_formatter(mdates.DateFormatter("%H:%M"))
 
 # Set the x-axis limits to 00:00 to 23:59
