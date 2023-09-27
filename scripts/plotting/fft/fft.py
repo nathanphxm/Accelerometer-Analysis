@@ -22,7 +22,7 @@ for line in lines:
     iter.append(iteration)
 
 # Convert timestamps to datetime objects
-datetimes = [datetime.utcfromtimestamp(ts) for ts in times]
+datetimes = [datetime.fromtimestamp(ts) for ts in times]
 print(datetimes[0])
 # Calculate the time difference between consecutive datetimes
 time_diff = (datetimes[-1] - datetimes[0]).total_seconds() / (len(datetimes) - 1)
