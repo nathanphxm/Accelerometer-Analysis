@@ -1,3 +1,5 @@
+### might be useful, but better to incorporate in delta graph
+
 # https://community.sw.siemens.com/s/article/calculate-a-vector-sum-to-make-understanding-vibration-data-easy
 
 import datetime
