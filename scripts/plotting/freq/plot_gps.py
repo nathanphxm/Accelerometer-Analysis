@@ -1,3 +1,7 @@
+### required by client
+
+# The main function for this code is to visualise the different movement in GPS location over time.
+
 import matplotlib.pyplot as plt
 from datetime import datetime
 

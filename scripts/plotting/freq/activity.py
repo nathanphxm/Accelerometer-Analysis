@@ -1,3 +1,8 @@
+### required by client
+
+# The main function for this code is to highlight different activity level (low, moderate, high) on the cumulative frequency graph.
+# Two threshold values are adjustable to determine the categorisation of activity level.
+
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 from datetime import datetime
