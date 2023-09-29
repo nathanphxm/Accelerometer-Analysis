@@ -2,6 +2,7 @@
 
 # The main function for this code is to highlight different activity level (low, moderate, high) on the cumulative frequency graph.
 # Two threshold values are adjustable to determine the categorisation of activity level.
+# Month and day can be selected to adjust the intended timeframe.
 
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
@@ -9,10 +10,12 @@ from datetime import datetime
 
 import datetime
 
+# funtion to change timestamp to normal datetime
 def parse_timestamp(unix_timestamp):
     timestamp = datetime.datetime.fromtimestamp(unix_timestamp)
     return timestamp.year, timestamp.month, timestamp.day, timestamp.hour, timestamp.minute, timestamp.second
 
+# function to read and process file into useable format
 def read_file(filename):
     formatted_data = [['Year', 'Month', 'Day', 'Hour', 'Minutes', 'Seconds', 'Index', 'X', 'Y', 'Z']]
     
@@ -27,11 +30,13 @@ def read_file(filename):
     
     return formatted_data
 
+# choose file required to be calculated and visualised
 #file_data = read_file('../../../resources/file011_clean.txt')
 #file_data = read_file('../../../paddock_data/green131_gps0459_file011_clean.txt')
 #file_data = read_file('../../../paddock_data/pink181_gps1032_file011_clean.txt')
 file_data = read_file('../../../paddock_data/yellow133_gps1098_file011_clean.txt')
 
+# function to filter out time selection
 def get_filtered_data(month, day=None, hour=None, minute=None, second=None):
     filtered_data = [['Index', 'X', 'Y', 'Z']]
     
@@ -43,6 +48,7 @@ def get_filtered_data(month, day=None, hour=None, minute=None, second=None):
     
     return filtered_data
 
+# function to calculate frequency of movement
 def calculate_frequency(data):
     frequency = 0
     previous_values = [None, None, None]
@@ -59,6 +65,7 @@ def calculate_frequency(data):
     
     return frequency
 
+# function to calculate frequency of movement per minute
 def frequency_per_day_by_minute(month, day):
     frequencies = [["Time", "Frequency of movement"]]
     
@@ -71,6 +78,7 @@ def frequency_per_day_by_minute(month, day):
         print(frequencies)
     return frequencies
 
+# function to classify different activity level
 def classify_activity(frequency, low_threshold, high_threshold):
     if frequency <= low_threshold:
         return "Low Activity"
@@ -79,6 +87,7 @@ def classify_activity(frequency, low_threshold, high_threshold):
     else:
         return "High Activity"
 
+# function to provide different colour to each activity level
 def color_by_activity(activity):
     if activity == "Low Activity":
         return 'blue'
@@ -87,6 +96,7 @@ def color_by_activity(activity):
     else:
         return 'red'
 
+# run all functions required to calculate cumulative frequency, categorise activity level and visualise them
 if __name__ == "__main__":
     month = 2
     day = 19
@@ -137,7 +147,7 @@ if __name__ == "__main__":
     plt.xlim(datetime(time[0].year, time[0].month, time[0].day, 0, 0), 
              datetime(time[-1].year, time[-1].month, time[-1].day, 23, 59))
 
-    # Customize legend
+    # Customise legend
     handles = [plt.Rectangle((0, 0), 1, 1, color=color_by_activity(act)) for act in ["Low Activity", "Moderate Activity", "High Activity"]]
     plt.legend(handles, ["Low Activity", "Moderate Activity", "High Activity"])
 
