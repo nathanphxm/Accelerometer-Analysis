@@ -1,3 +1,8 @@
+### required by client
+
+# The main function of this code is to calculate the frequency of movement per minute and visualise it.
+# The difference value to detect the movement is adjustable to determine the resolution of detection.
+
 import datetime
 
 def parse_timestamp(unix_timestamp):
