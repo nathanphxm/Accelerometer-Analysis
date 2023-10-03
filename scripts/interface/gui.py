@@ -4,12 +4,14 @@ sys.path.append(os.path.join(os.path.dirname(__file__), "..", "processing"))
 import tkinter as tk
 from tkinter import ttk  # For the Combobox widget
 from tkinter import filedialog
+from tkinter import messagebox
 import importlib
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from process_data import process_directory
 from tkcalendar import DateEntry
 from tkcalendar import Calendar
 from datetime import datetime, time
+import csv
 
 PLOTTING_DIR = os.path.join(os.path.dirname(__file__), "..", "plotting")
 load_data_button = None
@@ -169,12 +171,32 @@ def display_gui_components():
     print_button.pack(side=tk.RIGHT, padx=5, pady=10)
 
 def print_data():
-    global accelerometer_data, gps_data
-    #print(gps_data)
-    print(accelerometer_data[0][0])
-    print(accelerometer_data[-1][0])
-    print(start_datetime)
-    print(end_datetime)
+    global accelerometer_data
+
+     # Check if timestamps are selected
+    if start_datetime is None or end_datetime is None:
+        messagebox.showwarning("Warning", "Please select both start and end timestamps before printing.")
+        return
+        
+    # Prompt the user for a file name/location
+    file_name = filedialog.asksaveasfilename(defaultextension=".csv", filetypes=[("CSV files", "*.csv"), ("All files", "*.*")])
+    if not file_name:
+        return
+
+    # Convert the selected start and end datetimes to Unix timestamps
+    start_ts = start_datetime.timestamp()
+    end_ts = end_datetime.timestamp()
+
+    # Filter the accelerometer data based on the selected time range
+    filtered_data = [data for data in accelerometer_data if start_ts <= data[0] <= end_ts]
+
+    # Write the filtered data to the chosen file in CSV format
+    with open(file_name, 'w', newline='') as csvfile:
+        writer = csv.writer(csvfile)
+        writer.writerow(["Timestamp", "Interval", "ACCEL_X", "ACCEL_Y", "ACCEL_Z"])
+        writer.writerows(filtered_data)
+
+    print(f"Data saved to {file_name}")
 
 def display_graph(combobox):
     global current_canvas
