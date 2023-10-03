@@ -7,6 +7,9 @@ from tkinter import filedialog
 import importlib
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from process_data import process_directory
+from tkcalendar import DateEntry
+from tkcalendar import Calendar
+from datetime import datetime, time
 
 PLOTTING_DIR = os.path.join(os.path.dirname(__file__), "..", "plotting")
 load_data_button = None
@@ -35,10 +38,100 @@ def load_data():
         loaded_directory_label.config(text=f"Current Directory: {directory}")
         display_gui_components()
 
+def get_datetime_popup(initial_datetime=None, min_datetime=None, max_datetime=None):
+    popup = tk.Toplevel(root)
+    popup.title("Select Date and Time")
+
+    calendar = Calendar(popup, selectmode="day")
+    calendar.pack(pady=10, padx=10)
+    calendar.calevent_remove("all")  # Remove all events
+    calendar.config(mindate=min_datetime.date(), maxdate=max_datetime.date())
+
+    hour_scale = tk.Scale(popup, from_=0, to=23, orient=tk.HORIZONTAL, label="Hour")
+    hour_scale.pack(pady=10, padx=10, fill=tk.X)
+
+    minute_scale = tk.Scale(popup, from_=0, to=59, orient=tk.HORIZONTAL, label="Minute")
+    minute_scale.pack(pady=10, padx=10, fill=tk.X)
+
+    def on_date_selected(event):
+        selected_date = datetime.strptime(calendar.get_date(), '%m/%d/%y').date()
+        
+        # Reset scales to full range
+        hour_scale.config(from_=0, to=23)
+        minute_scale.config(from_=0, to=59)
+        
+        if selected_date == min_datetime.date():
+            hour_scale.config(from_=min_datetime.hour)
+            if hour_scale.get() < min_datetime.hour:
+                hour_scale.set(min_datetime.hour)
+            if hour_scale.get() == min_datetime.hour:
+                minute_scale.config(from_=min_datetime.minute)
+        elif selected_date == max_datetime.date():
+            hour_scale.config(to=max_datetime.hour)
+            if hour_scale.get() > max_datetime.hour:
+                hour_scale.set(max_datetime.hour)
+            if hour_scale.get() == max_datetime.hour:
+                minute_scale.config(to=max_datetime.minute)
+
+    if initial_datetime:
+        calendar.selection_set(initial_datetime.date())
+        on_date_selected(None)  # Call the function to adjust the time scales based on the initial date
+
+    calendar.bind("<<CalendarSelected>>", on_date_selected)
+
+    def on_ok():
+        selected_date_str = calendar.get_date()
+        selected_date = datetime.strptime(selected_date_str, '%m/%d/%y').date()
+        selected_time = time(hour=hour_scale.get(), minute=minute_scale.get())
+        selected_datetime = datetime.combine(selected_date, selected_time)
+        popup.selected_datetime = selected_datetime
+        popup.destroy()
+
+    def on_cancel():
+        popup.destroy()
+
+    ok_button = tk.Button(popup, text="OK", command=on_ok)
+    ok_button.pack(side=tk.LEFT, padx=10, pady=10)
+
+    cancel_button = tk.Button(popup, text="Cancel", command=on_cancel)
+    cancel_button.pack(side=tk.RIGHT, padx=10, pady=10)
+
+    popup.grab_set()  # Makes the popup modal
+    root.wait_window(popup)  # Waits until the popup is closed
+
+    return getattr(popup, 'selected_datetime', None)
+
 def display_gui_components():
     # Frame for top buttons
     top_frame = tk.Frame(root)
     top_frame.pack(side=tk.TOP, fill=tk.X)
+
+    min_datetime = datetime.utcfromtimestamp(accelerometer_data[0][0])
+    max_datetime = datetime.utcfromtimestamp(accelerometer_data[-1][0])
+
+    # Start date and time button
+    def set_start_datetime():
+        selected_datetime = get_datetime_popup(initial_datetime=min_datetime, min_datetime=min_datetime, max_datetime=max_datetime)
+        if selected_datetime:
+            if hasattr(end_datetime_button, 'selected_datetime') and selected_datetime > end_datetime_button.selected_datetime:
+                selected_datetime = end_datetime_button.selected_datetime
+            start_datetime_button.config(text=selected_datetime.strftime('%Y-%m-%d %H:%M'))
+            start_datetime_button.selected_datetime = selected_datetime
+
+    start_datetime_button = tk.Button(top_frame, text="Set Start Date & Time", command=set_start_datetime)
+    start_datetime_button.pack(side=tk.LEFT, padx=5, pady=10)
+
+    # End date and time button
+    def set_end_datetime():
+        selected_datetime = get_datetime_popup(initial_datetime=max_datetime, min_datetime=min_datetime, max_datetime=max_datetime)
+        if selected_datetime:
+            if hasattr(start_datetime_button, 'selected_datetime') and selected_datetime < start_datetime_button.selected_datetime:
+                selected_datetime = start_datetime_button.selected_datetime
+            end_datetime_button.config(text=selected_datetime.strftime('%Y-%m-%d %H:%M'))
+            end_datetime_button.selected_datetime = selected_datetime
+
+    end_datetime_button = tk.Button(top_frame, text="Set End Date & Time", command=set_end_datetime)
+    end_datetime_button.pack(side=tk.LEFT, padx=5, pady=10)
 
     # Create a Combobox
     combobox = ttk.Combobox(top_frame)
@@ -64,7 +157,9 @@ def display_gui_components():
 
 def print_data():
     global accelerometer_data, gps_data
-    print(gps_data)
+    #print(gps_data)
+    print(accelerometer_data[0][0])
+    print(accelerometer_data[-1][0])
 
 def display_graph(combobox):
     global current_canvas
