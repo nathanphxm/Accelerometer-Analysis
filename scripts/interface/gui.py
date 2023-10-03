@@ -13,6 +13,8 @@ from datetime import datetime, time
 
 PLOTTING_DIR = os.path.join(os.path.dirname(__file__), "..", "plotting")
 load_data_button = None
+start_datetime = None
+end_datetime = None
 accelerometer_data = []
 gps_data = []
 
@@ -59,6 +61,8 @@ def get_datetime_popup(initial_datetime=None, min_datetime=None, max_datetime=No
         # Reset scales to full range
         hour_scale.config(from_=0, to=23)
         minute_scale.config(from_=0, to=59)
+        print(max_datetime)
+        print(max_datetime.hour)
         
         if selected_date == min_datetime.date():
             hour_scale.config(from_=min_datetime.hour)
@@ -73,9 +77,19 @@ def get_datetime_popup(initial_datetime=None, min_datetime=None, max_datetime=No
             if hour_scale.get() == max_datetime.hour:
                 minute_scale.config(to=max_datetime.minute)
 
+        if selected_date == max_datetime.date():
+            hour_scale.config(from_=0, to=max_datetime.hour)
+            minute_scale.config(from_=0, to=max_datetime.minute)
+
     if initial_datetime:
         calendar.selection_set(initial_datetime.date())
-        on_date_selected(None)  # Call the function to adjust the time scales based on the initial date
+        if initial_datetime == min_datetime:
+            hour_scale.config(from_=min_datetime.hour)
+            minute_scale.config(from_=min_datetime.minute)
+        elif initial_datetime == max_datetime:
+            hour_scale.set(max_datetime.hour)
+            minute_scale.set(max_datetime.minute)
+        on_date_selected(None)
 
     calendar.bind("<<CalendarSelected>>", on_date_selected)
 
@@ -98,7 +112,6 @@ def get_datetime_popup(initial_datetime=None, min_datetime=None, max_datetime=No
 
     popup.grab_set()  # Makes the popup modal
     root.wait_window(popup)  # Waits until the popup is closed
-
     return getattr(popup, 'selected_datetime', None)
 
 def display_gui_components():
@@ -111,24 +124,26 @@ def display_gui_components():
 
     # Start date and time button
     def set_start_datetime():
-        selected_datetime = get_datetime_popup(initial_datetime=min_datetime, min_datetime=min_datetime, max_datetime=max_datetime)
+        global start_datetime
+        max_dt = end_datetime if end_datetime else max_datetime
+        selected_datetime = get_datetime_popup(initial_datetime=min_datetime, min_datetime=min_datetime, max_datetime=max_dt)
         if selected_datetime:
-            if hasattr(end_datetime_button, 'selected_datetime') and selected_datetime > end_datetime_button.selected_datetime:
-                selected_datetime = end_datetime_button.selected_datetime
             start_datetime_button.config(text=selected_datetime.strftime('%Y-%m-%d %H:%M'))
             start_datetime_button.selected_datetime = selected_datetime
+            start_datetime = selected_datetime  # Update the global variable
 
     start_datetime_button = tk.Button(top_frame, text="Set Start Date & Time", command=set_start_datetime)
     start_datetime_button.pack(side=tk.LEFT, padx=5, pady=10)
 
     # End date and time button
     def set_end_datetime():
-        selected_datetime = get_datetime_popup(initial_datetime=max_datetime, min_datetime=min_datetime, max_datetime=max_datetime)
+        global end_datetime
+        min_dt = start_datetime if start_datetime else min_datetime
+        selected_datetime = get_datetime_popup(initial_datetime=max_datetime, min_datetime=min_dt, max_datetime=max_datetime)
         if selected_datetime:
-            if hasattr(start_datetime_button, 'selected_datetime') and selected_datetime < start_datetime_button.selected_datetime:
-                selected_datetime = start_datetime_button.selected_datetime
             end_datetime_button.config(text=selected_datetime.strftime('%Y-%m-%d %H:%M'))
             end_datetime_button.selected_datetime = selected_datetime
+            end_datetime = selected_datetime  # Update the global variable
 
     end_datetime_button = tk.Button(top_frame, text="Set End Date & Time", command=set_end_datetime)
     end_datetime_button.pack(side=tk.LEFT, padx=5, pady=10)
