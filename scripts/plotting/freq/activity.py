@@ -126,6 +126,11 @@ if __name__ == "__main__":
     plt.figure(figsize=(12, 6), facecolor='white')
     plt.plot(time, frequency, marker='o', color='blue', label='Cumulative Frequency')
 
+    import csv
+
+    # Create a list to store the rows for the CSV
+    csv_rows = [['Datetime', 'Frequency per Minute', 'Activity Level']]
+
     # Add lower-opacity squares to differentiate activity levels
     for i in range(len(time)):
         all_freq = freq_data[1:]
@@ -133,6 +138,19 @@ if __name__ == "__main__":
         act_level = classify_activity(freq, low_activity_threshold, high_activity_threshold)
         color = color_by_activity(act_level)
         plt.fill_between([time[i]], cumulative_freq, color=color, alpha=0.3)
+        row = [time[i], freq, act_level]
+        csv_rows.append(row)
+
+    # Specify the CSV file path
+    csv_file_path = 'output.csv'
+
+    # Write the data to the CSV file
+    with open(csv_file_path, 'w', newline='') as csv_file:
+        csv_writer = csv.writer(csv_file)
+        csv_writer.writerows(csv_rows)
+
+    # Display a message indicating where the CSV file was saved
+    print(f'CSV file saved at: {csv_file_path}')
 
     plt.xlabel('Time')
     plt.ylabel('Cumulative Frequency of Movement')
