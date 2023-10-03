@@ -61,8 +61,6 @@ def get_datetime_popup(initial_datetime=None, min_datetime=None, max_datetime=No
         # Reset scales to full range
         hour_scale.config(from_=0, to=23)
         minute_scale.config(from_=0, to=59)
-        print(max_datetime)
-        print(max_datetime.hour)
         
         if selected_date == min_datetime.date():
             hour_scale.config(from_=min_datetime.hour)
@@ -175,6 +173,8 @@ def print_data():
     #print(gps_data)
     print(accelerometer_data[0][0])
     print(accelerometer_data[-1][0])
+    print(start_datetime)
+    print(end_datetime)
 
 def display_graph(combobox):
     global current_canvas
