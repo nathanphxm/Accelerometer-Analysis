@@ -19,6 +19,7 @@ start_datetime = None
 end_datetime = None
 accelerometer_data = []
 gps_data = []
+data_from_graph = []
 
 def load_data():
     global load_data_button, loaded_directory_label, loading_label, accelerometer_data, gps_data
@@ -32,6 +33,7 @@ def load_data():
         root.update_idletasks()  # Process all pending GUI tasks again
 
         accelerometer_data, gps_data = process_directory(directory)
+        print(f"Loaded {len(accelerometer_data)} accelerometer data points.")
 
         #reset loading feedback
         root.config(cursor="")
@@ -76,10 +78,6 @@ def get_datetime_popup(initial_datetime=None, min_datetime=None, max_datetime=No
                 hour_scale.set(max_datetime.hour)
             if hour_scale.get() == max_datetime.hour:
                 minute_scale.config(to=max_datetime.minute)
-
-        if selected_date == max_datetime.date():
-            hour_scale.config(from_=0, to=max_datetime.hour)
-            minute_scale.config(from_=0, to=max_datetime.minute)
 
     if initial_datetime:
         calendar.selection_set(initial_datetime.date())
@@ -188,7 +186,9 @@ def print_data():
     end_ts = end_datetime.timestamp()
 
     # Filter the accelerometer data based on the selected time range
+    print(f"Start timestamp: {start_ts}, End timestamp: {end_ts}")
     filtered_data = [data for data in accelerometer_data if start_ts <= data[0] <= end_ts]
+    print(f"Filtered data contains {len(filtered_data)} points.")
 
     # Write the filtered data to the chosen file in CSV format
     with open(file_name, 'w', newline='') as csvfile:
@@ -209,7 +209,14 @@ def display_graph(combobox):
     # Dynamically import the module using the module path
     plot_module = importlib.import_module(module_path)
 
-    fig = plot_module.plot_graph()
+    # Convert the selected start and end datetimes to Unix timestamps
+    start_ts = start_datetime.timestamp()
+    end_ts = end_datetime.timestamp()
+
+    # Filter the accelerometer data based on the selected time range
+    filtered_data = [data for data in accelerometer_data if start_ts <= data[0] <= end_ts]
+
+    fig = plot_module.plot_graph(filtered_data)
 
     # Remove the old canvas (if it exists)
     if current_canvas:
