@@ -10,13 +10,14 @@ from process_data import process_directory
 
 PLOTTING_DIR = os.path.join(os.path.dirname(__file__), "..", "plotting")
 load_data_button = None
-data = None
+accelerometer_data = []
+gps_data = []
 
 def load_data():
-    global load_data_button, loaded_directory_label, data
+    global load_data_button, loaded_directory_label, accelerometer_data, gps_data
     directory = filedialog.askdirectory()  # Open directory selection dialog
     if directory:
-        process_directory(directory)
+        accelerometer_data, gps_data = process_directory(directory)
         # If a directory is selected, hide the load_data_button and display the rest of the GUI components
         load_data_button.pack_forget()
         loaded_directory_label.config(text=f"Current Directory: {directory}")
@@ -50,7 +51,8 @@ def display_gui_components():
     print_button.pack(side=tk.RIGHT, padx=5, pady=10)
 
 def print_data():
-    print('test')
+    global accelerometer_data, gps_data
+    print(gps_data)
 
 def display_graph(combobox):
     global current_canvas

@@ -73,5 +73,3 @@ def process_directory(directory):
         all_gps_data.extend(gps_data)
 
     return all_accelerometer_data, all_gps_data
-
-    return all_data
