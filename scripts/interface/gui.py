@@ -22,11 +22,21 @@ def run_gui():
         x, y = (root.winfo_screenwidth() - w) // 2, (root.winfo_screenheight() - h) // 2
         root.geometry(f"{int(w)}x{int(h)}+{int(x)}+{int(y)}")
 
-    root.title("Graph Selection")
+    # Frame for top buttons
+    top_frame = tk.Frame(root)
+    top_frame.pack(side=tk.TOP, fill=tk.X)
 
     # Create a Combobox
-    combobox = ttk.Combobox(root)
-    combobox.pack(pady=20, padx=20)
+    combobox = ttk.Combobox(top_frame)
+    combobox.pack(side=tk.LEFT, pady=20, padx=20)
+
+    # Button to display graph
+    btn = tk.Button(top_frame, text="Display Graph", command=lambda: display_graph(combobox))
+    btn.pack(side=tk.RIGHT, padx=5, pady=10)  # This ensures the button is on the right side of the top frame, but to the left of the Print Data button
+
+    # Button to print data
+    print_button = tk.Button(top_frame, text="Print Data", command=print_data)
+    print_button.pack(side=tk.RIGHT, padx=5, pady=10) 
 
     # Populate Combobox with Python scripts from all subdirectories in the plotting folder
     scripts = []
@@ -38,13 +48,13 @@ def run_gui():
 
     combobox['values'] = scripts
 
-    btn = tk.Button(root, text="Display Graph", command=lambda: display_graph(combobox))
-    btn.pack(pady=20)
-
     root.mainloop()
 
 
 current_canvas = None
+
+def print_data():
+    print('test')
 
 def display_graph(combobox):
     global current_canvas
