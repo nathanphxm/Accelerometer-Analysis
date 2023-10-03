@@ -1,19 +1,22 @@
 import os
 import sys
+sys.path.append(os.path.join(os.path.dirname(__file__), "..", "processing"))
 import tkinter as tk
 from tkinter import ttk  # For the Combobox widget
 from tkinter import filedialog
 import importlib
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-from '../processing/process_data.py' import process_file
+from process_data import process_directory
 
 PLOTTING_DIR = os.path.join(os.path.dirname(__file__), "..", "plotting")
 load_data_button = None
+data = None
 
 def load_data():
-    global load_data_button, loaded_directory_label
+    global load_data_button, loaded_directory_label, data
     directory = filedialog.askdirectory()  # Open directory selection dialog
     if directory:
+        process_directory(directory)
         # If a directory is selected, hide the load_data_button and display the rest of the GUI components
         load_data_button.pack_forget()
         loaded_directory_label.config(text=f"Current Directory: {directory}")
