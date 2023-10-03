@@ -10,11 +10,12 @@ PLOTTING_DIR = os.path.join(os.path.dirname(__file__), "..", "plotting")
 load_data_button = None
 
 def load_data():
-    global load_data_button
+    global load_data_button, loaded_directory_label
     directory = filedialog.askdirectory()  # Open directory selection dialog
     if directory:
         # If a directory is selected, hide the load_data_button and display the rest of the GUI components
         load_data_button.pack_forget()
+        loaded_directory_label.config(text=f"Current Directory: {directory}")
         display_gui_components()
 
 def display_gui_components():
@@ -74,7 +75,7 @@ def display_graph(combobox):
     current_canvas = canvas
 
 def run_gui():
-    global load_data_button
+    global load_data_button, loaded_directory_label
     global root
     root = tk.Tk()
 
@@ -87,6 +88,10 @@ def run_gui():
         w, h = root.winfo_screenwidth() * 0.8, root.winfo_screenheight() * 0.8
         x, y = (root.winfo_screenwidth() - w) // 2, (root.winfo_screenheight() - h) // 2
         root.geometry(f"{int(w)}x{int(h)}+{int(x)}+{int(y)}")
+
+    # Label to display the path of the loaded directory
+    loaded_directory_label = tk.Label(root, text="")
+    loaded_directory_label.pack(pady=10)
 
     # Initially, only display the "Load Data" button in the middle
     load_data_button = tk.Button(root, text="Load Data", command=load_data)
