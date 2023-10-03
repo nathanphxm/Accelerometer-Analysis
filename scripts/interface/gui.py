@@ -94,9 +94,7 @@ def run_gui():
 
     root.mainloop()
 
-
 current_canvas = None
-
 
 if __name__ == "__main__":
     run_gui()
