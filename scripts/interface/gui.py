@@ -14,10 +14,22 @@ accelerometer_data = []
 gps_data = []
 
 def load_data():
-    global load_data_button, loaded_directory_label, accelerometer_data, gps_data
+    global load_data_button, loaded_directory_label, loading_label, accelerometer_data, gps_data
     directory = filedialog.askdirectory()  # Open directory selection dialog
     if directory:
+        #show that data is loading
+        loading_label.config(text="Processing data, please wait...", fg="red")
+        root.update_idletasks()  # Process all pending GUI tasks
+        root.config(cursor="wait")
+        root.update()  # Update the GUI
+        root.update_idletasks()  # Process all pending GUI tasks again
+
         accelerometer_data, gps_data = process_directory(directory)
+
+        #reset loading feedback
+        root.config(cursor="")
+        loading_label.config(text="")
+
         # If a directory is selected, hide the load_data_button and display the rest of the GUI components
         load_data_button.pack_forget()
         loaded_directory_label.config(text=f"Current Directory: {directory}")
@@ -81,7 +93,7 @@ def display_graph(combobox):
     current_canvas = canvas
 
 def run_gui():
-    global load_data_button, loaded_directory_label
+    global load_data_button, loaded_directory_label, loading_label
     global root
     root = tk.Tk()
 
@@ -98,6 +110,9 @@ def run_gui():
     # Label to display the path of the loaded directory
     loaded_directory_label = tk.Label(root, text="")
     loaded_directory_label.pack(pady=10)
+
+    loading_label = tk.Label(root, text="")
+    loading_label.pack(pady=10)
 
     # Initially, only display the "Load Data" button in the middle
     load_data_button = tk.Button(root, text="Load Data", command=load_data)
