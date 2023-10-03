@@ -5,6 +5,7 @@ from tkinter import ttk  # For the Combobox widget
 from tkinter import filedialog
 import importlib
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from '../processing/process_data.py' import process_file
 
 PLOTTING_DIR = os.path.join(os.path.dirname(__file__), "..", "plotting")
 load_data_button = None

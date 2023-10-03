@@ -1,37 +1,36 @@
 import re
 import datetime
-import argparse
+import os
 
 def process_file(filename):
     timestamp_diff, lines = get_timestamp_diff_and_lines(filename)
 
-    gps_filename = filename.replace('.txt', '_gps.txt')
-    clean_filename = filename.replace('.txt', '_clean.txt')
+    accelerometer_data = []
+    gps_data = []
 
-    with open(gps_filename, 'w') as gps_file, \
-         open(clean_filename, 'w') as clean_file:
+    current_timestamp = 0
+    count = 1
+    for line in lines:
+        line = line.strip()
+        values = line.split(',')
         
-        current_timestamp = 0
-        count = 1
-        for line in lines:
-            line = line.strip()
-            values = line.split(',')
-            
-            match = re.match(r'\*(\d+)', line)
-            if match:
-                current_timestamp = int(match.group(1)) + timestamp_diff
-                count = 1
-                continue
+        match = re.match(r'\*(\d+)', line)
+        if match:
+            current_timestamp = int(match.group(1)) + timestamp_diff
+            count = 1
+            continue
 
-            if len(values) == 11:
-                gps_file.write(','.join(values[3:11]) + '\n')
-                continue
+        if len(values) == 11:
+            gps_data.append(values[3:11])
+            continue
 
-            if len(values) == 3 and values != ['0', '0', '0']:
-                output = [current_timestamp, count] + values
-                clean_file.write(','.join(map(str, output)) + '\n')
-            
-            count += 1
+        if len(values) == 3 and values != ['0', '0', '0']:
+            output = [current_timestamp, count] + values
+            accelerometer_data.append(output)
+        
+        count += 1
+
+    return accelerometer_data, gps_data
 
 
 def get_timestamp_diff_and_lines(filename):
@@ -56,9 +55,23 @@ def get_timestamp_diff_and_lines(filename):
 
     return calculated_timestamp - given_timestamp, lines
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Process a file and split its content based on certain conditions.")
-    parser.add_argument("filename", help="Path to the file to be processed.")
-    args = parser.parse_args()
+def process_directory(directory):
+    # List all files in the directory
+    files = os.listdir(directory)
 
-    process_file(args.filename)
+    # Filter out files that match the pattern
+    pattern = re.compile(r'file\d{3}\.txt')
+    matching_files = [f for f in files if pattern.match(f)]
+
+    # Process each file and concatenate the data
+    all_accelerometer_data = []
+    all_gps_data = []
+    for filename in matching_files:
+        filepath = os.path.join(directory, filename)
+        accelerometer_data, gps_data = process_file(filepath)
+        all_accelerometer_data.extend(accelerometer_data)
+        all_gps_data.extend(gps_data)
+
+    return all_accelerometer_data, all_gps_data
+
+    return all_data
