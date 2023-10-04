@@ -49,7 +49,7 @@ def get_timestamp_diff_and_lines(filename):
                 given_timestamp = int(match.group(1))
 
             if len(values) == 11:
-                dt = datetime.datetime(int(values[7]), int(values[6]), int(values[5]), int(values[8]), int(values[9]), int(values[10]))
+                dt = datetime.datetime(int(values[7]), int(values[6]), int(values[5]), int(values[8]), int(values[9]), int(values[10]), tzinfo=datetime.timezone.utc)
                 calculated_timestamp = int(dt.timestamp())
                 break  
 

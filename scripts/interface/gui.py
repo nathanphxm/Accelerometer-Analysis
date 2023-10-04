@@ -10,7 +10,7 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from process_data import process_directory
 from tkcalendar import DateEntry
 from tkcalendar import Calendar
-from datetime import datetime, time
+from datetime import timezone, timedelta, datetime, time
 import csv
 
 PLOTTING_DIR = os.path.join(os.path.dirname(__file__), "..", "plotting")
@@ -20,6 +20,7 @@ end_datetime = None
 accelerometer_data = []
 gps_data = []
 data_from_graph = []
+GMT8 = timezone(timedelta(hours=8))
 
 def load_data():
     global load_data_button, loaded_directory_label, loading_label, accelerometer_data, gps_data
@@ -117,8 +118,8 @@ def display_gui_components():
     top_frame = tk.Frame(root)
     top_frame.pack(side=tk.TOP, fill=tk.X)
 
-    min_datetime = datetime.utcfromtimestamp(accelerometer_data[0][0])
-    max_datetime = datetime.utcfromtimestamp(accelerometer_data[-1][0])
+    min_datetime = datetime.fromtimestamp(accelerometer_data[0][0], GMT8)
+    max_datetime = datetime.fromtimestamp(accelerometer_data[-1][0], GMT8)
 
     # Start date and time button
     def set_start_datetime():
@@ -171,6 +172,9 @@ def display_gui_components():
 def print_data():
     global accelerometer_data
 
+    print(accelerometer_data[0][0])
+    print(accelerometer_data[-1][0])
+    
      # Check if timestamps are selected
     if start_datetime is None or end_datetime is None:
         messagebox.showwarning("Warning", "Please select both start and end timestamps before printing.")
