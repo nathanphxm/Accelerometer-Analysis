@@ -171,12 +171,6 @@ def display_gui_components():
 
 def print_data():
     global accelerometer_data
-
-    print(accelerometer_data[0][0])
-    print(accelerometer_data[-1][0])
-
-    print(start_datetime.timestamp())
-    print(end_datetime.timestamp())
     
      # Check if timestamps are selected
     if start_datetime is None or end_datetime is None:
@@ -193,9 +187,7 @@ def print_data():
     end_ts = end_datetime.timestamp()
 
     # Filter the accelerometer data based on the selected time range
-    print(f"Start timestamp: {start_ts}, End timestamp: {end_ts}")
     filtered_data = [data for data in accelerometer_data if start_ts <= data[0] <= end_ts]
-    print(f"Filtered data contains {len(filtered_data)} points.")
 
     # Write the filtered data to the chosen file in CSV format
     with open(file_name, 'w', newline='') as csvfile:
