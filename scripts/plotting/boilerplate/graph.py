@@ -30,9 +30,9 @@ def plot_graph(data):
     ax.set_xlabel('Time')
     ax.set_ylabel('Acceleration Value')
     ax.set_title('Accelerometer Data Over Time')
-    ax.legend()
+    ax.legend(loc='upper left')
 
     # Display the plot
-    plt.show()
+#     plt.show()
 
     return fig

@@ -174,6 +174,9 @@ def print_data():
 
     print(accelerometer_data[0][0])
     print(accelerometer_data[-1][0])
+
+    print(start_datetime.timestamp())
+    print(end_datetime.timestamp())
     
      # Check if timestamps are selected
     if start_datetime is None or end_datetime is None:
@@ -219,7 +222,7 @@ def display_graph(combobox):
 
     # Filter the accelerometer data based on the selected time range
     filtered_data = [data for data in accelerometer_data if start_ts <= data[0] <= end_ts]
-
+    print(len(filtered_data))
     fig = plot_module.plot_graph(filtered_data)
 
     # Remove the old canvas (if it exists)
