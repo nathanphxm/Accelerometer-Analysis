@@ -5,12 +5,13 @@ import tkinter as tk
 from tkinter import ttk  # For the Combobox widget
 from tkinter import filedialog
 from tkinter import messagebox
+from ttkthemes import ThemedTk
 import importlib
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from process_data import process_directory
 from tkcalendar import DateEntry
 from tkcalendar import Calendar
-from datetime import datetime, time
+from datetime import timezone, timedelta, datetime, time
 import csv
 
 PLOTTING_DIR = os.path.join(os.path.dirname(__file__), "..", "plotting")
@@ -20,6 +21,7 @@ end_datetime = None
 accelerometer_data = []
 gps_data = []
 data_from_graph = []
+GMT8 = timezone(timedelta(hours=8))
 
 def load_data():
     global load_data_button, loaded_directory_label, loading_label, accelerometer_data, gps_data
@@ -91,6 +93,20 @@ def get_datetime_popup(initial_datetime=None, min_datetime=None, max_datetime=No
 
     calendar.bind("<<CalendarSelected>>", on_date_selected)
 
+    def on_hour_changed(event=None):
+        selected_date = datetime.strptime(calendar.get_date(), '%m/%d/%y').date()
+        # Reset minute scale to full range initially
+        minute_scale.config(from_=0, to=59)
+        
+        if selected_date == min_datetime.date():
+            if hour_scale.get() == min_datetime.hour:
+                minute_scale.config(from_=min_datetime.minute)
+        elif selected_date == max_datetime.date():
+            if hour_scale.get() == max_datetime.hour:
+                minute_scale.config(to=max_datetime.minute)
+
+    hour_scale.bind("<B1-Motion>", on_hour_changed)  # Bind the function to the hour slider's change event
+
     def on_ok():
         selected_date_str = calendar.get_date()
         selected_date = datetime.strptime(selected_date_str, '%m/%d/%y').date()
@@ -102,10 +118,10 @@ def get_datetime_popup(initial_datetime=None, min_datetime=None, max_datetime=No
     def on_cancel():
         popup.destroy()
 
-    ok_button = tk.Button(popup, text="OK", command=on_ok)
+    ok_button = ttk.Button(popup, text="OK", command=on_ok)
     ok_button.pack(side=tk.LEFT, padx=10, pady=10)
 
-    cancel_button = tk.Button(popup, text="Cancel", command=on_cancel)
+    cancel_button = ttk.Button(popup, text="Cancel", command=on_cancel)
     cancel_button.pack(side=tk.RIGHT, padx=10, pady=10)
 
     popup.grab_set()  # Makes the popup modal
@@ -117,8 +133,8 @@ def display_gui_components():
     top_frame = tk.Frame(root)
     top_frame.pack(side=tk.TOP, fill=tk.X)
 
-    min_datetime = datetime.utcfromtimestamp(accelerometer_data[0][0])
-    max_datetime = datetime.utcfromtimestamp(accelerometer_data[-1][0])
+    min_datetime = datetime.fromtimestamp(accelerometer_data[0][0], GMT8)
+    max_datetime = datetime.fromtimestamp(accelerometer_data[-1][0], GMT8)
 
     # Start date and time button
     def set_start_datetime():
@@ -130,7 +146,7 @@ def display_gui_components():
             start_datetime_button.selected_datetime = selected_datetime
             start_datetime = selected_datetime  # Update the global variable
 
-    start_datetime_button = tk.Button(top_frame, text="Set Start Date & Time", command=set_start_datetime)
+    start_datetime_button = ttk.Button(top_frame, text="Set Start Date & Time", command=set_start_datetime)
     start_datetime_button.pack(side=tk.LEFT, padx=5, pady=10)
 
     # End date and time button
@@ -143,7 +159,7 @@ def display_gui_components():
             end_datetime_button.selected_datetime = selected_datetime
             end_datetime = selected_datetime  # Update the global variable
 
-    end_datetime_button = tk.Button(top_frame, text="Set End Date & Time", command=set_end_datetime)
+    end_datetime_button = ttk.Button(top_frame, text="Set End Date & Time", command=set_end_datetime)
     end_datetime_button.pack(side=tk.LEFT, padx=5, pady=10)
 
     # Create a Combobox
@@ -161,16 +177,16 @@ def display_gui_components():
     combobox['values'] = scripts
 
     # Button to display graph
-    btn = tk.Button(top_frame, text="Display Graph", command=lambda: display_graph(combobox))
+    btn = ttk.Button(top_frame, text="Display Graph", command=lambda: display_graph(combobox))
     btn.pack(side=tk.RIGHT, padx=5, pady=10)
 
     # Button to print data
-    print_button = tk.Button(top_frame, text="Print Data", command=print_data)
+    print_button = ttk.Button(top_frame, text="Print Data", command=print_data)
     print_button.pack(side=tk.RIGHT, padx=5, pady=10)
 
 def print_data():
     global accelerometer_data
-
+    
      # Check if timestamps are selected
     if start_datetime is None or end_datetime is None:
         messagebox.showwarning("Warning", "Please select both start and end timestamps before printing.")
@@ -186,9 +202,7 @@ def print_data():
     end_ts = end_datetime.timestamp()
 
     # Filter the accelerometer data based on the selected time range
-    print(f"Start timestamp: {start_ts}, End timestamp: {end_ts}")
     filtered_data = [data for data in accelerometer_data if start_ts <= data[0] <= end_ts]
-    print(f"Filtered data contains {len(filtered_data)} points.")
 
     # Write the filtered data to the chosen file in CSV format
     with open(file_name, 'w', newline='') as csvfile:
@@ -215,7 +229,7 @@ def display_graph(combobox):
 
     # Filter the accelerometer data based on the selected time range
     filtered_data = [data for data in accelerometer_data if start_ts <= data[0] <= end_ts]
-
+    print(len(filtered_data))
     fig = plot_module.plot_graph(filtered_data)
 
     # Remove the old canvas (if it exists)
@@ -234,7 +248,8 @@ def display_graph(combobox):
 def run_gui():
     global load_data_button, loaded_directory_label, loading_label
     global root
-    root = tk.Tk()
+    # root = tk.Tk()
+    root = ThemedTk(theme="arc")
 
     # Maximizing the window based on the platform
     if sys.platform == "win32":
@@ -247,14 +262,14 @@ def run_gui():
         root.geometry(f"{int(w)}x{int(h)}+{int(x)}+{int(y)}")
 
     # Label to display the path of the loaded directory
-    loaded_directory_label = tk.Label(root, text="")
+    loaded_directory_label = ttk.Label(root, text="")
     loaded_directory_label.pack(pady=10)
 
-    loading_label = tk.Label(root, text="")
+    loading_label = ttk.Label(root, text="")
     loading_label.pack(pady=10)
 
     # Initially, only display the "Load Data" button in the middle
-    load_data_button = tk.Button(root, text="Load Data", command=load_data)
+    load_data_button = ttk.Button(root, text="Load Data", command=load_data)
     load_data_button.pack(pady=20)
 
     root.mainloop()
