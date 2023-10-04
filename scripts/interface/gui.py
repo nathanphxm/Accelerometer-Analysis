@@ -92,6 +92,20 @@ def get_datetime_popup(initial_datetime=None, min_datetime=None, max_datetime=No
 
     calendar.bind("<<CalendarSelected>>", on_date_selected)
 
+    def on_hour_changed(event=None):
+        selected_date = datetime.strptime(calendar.get_date(), '%m/%d/%y').date()
+        # Reset minute scale to full range initially
+        minute_scale.config(from_=0, to=59)
+        
+        if selected_date == min_datetime.date():
+            if hour_scale.get() == min_datetime.hour:
+                minute_scale.config(from_=min_datetime.minute)
+        elif selected_date == max_datetime.date():
+            if hour_scale.get() == max_datetime.hour:
+                minute_scale.config(to=max_datetime.minute)
+
+    hour_scale.bind("<B1-Motion>", on_hour_changed)  # Bind the function to the hour slider's change event
+
     def on_ok():
         selected_date_str = calendar.get_date()
         selected_date = datetime.strptime(selected_date_str, '%m/%d/%y').date()
