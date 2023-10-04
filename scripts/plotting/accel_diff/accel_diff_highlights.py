@@ -1,3 +1,9 @@
+'''
+A script to plot delta acceleration of each axis, as well as highlighting the activity level in 3 categories: low, medium, high
+By inputting upper and lower threshold, the intensity of activity highlights can be adjusted.
+Adding on to that, there's a function to pick hours of the day to specify the scope of analysis.
+'''
+
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
@@ -12,6 +18,7 @@ times, xs, ys, zs, iter = [], [], [], [], []
 magnitude = []
 for_mean = []
 
+# file reading
 for line in lines:
     timestamp, iteration, x, y, z = map(int, line.split(","))
     # Convert timestamp and iteration into continuous time
@@ -27,18 +34,7 @@ for line in lines:
 # Convert timestamps to datetime objects
 datetimes = [datetime.fromtimestamp(ts) for ts in times]
 
-def pick_hour(start,end):
-    indices = np.where([dt.hour in range(start,end+1) for dt in datetimes])[0]
-    filtered_datetimes = [datetimes[i] for i in indices]
-    filtered_x = [xs[i] for i in indices]
-    filtered_y = [ys[i] for i in indices]
-    filtered_z = [zs[i] for i in indices]
-    filtered_mag = [magnitude[i] for i in indices]
-    filtered_iter = [iter[i] for i in indices]
-    
-    return filtered_datetimes,filtered_x,filtered_y,filtered_z,filtered_mag,filtered_iter
-
-#function to return indices from selected hours
+# function to filter our specific hours of the day for analysis
 def filter_hour(start_hour, end_hour):
     hour_indices = np.where((datetimes[0].hour <= start_hour) & (datetimes[0].hour >= end_hour))[0]
     xs = xs[hour_indices]
@@ -48,12 +44,8 @@ def filter_hour(start_hour, end_hour):
     iter = iter[hour_indices]
     return xs, ys, zs, magnitude, iter
 
-# Define threshold values
-low_threshold = 300
-medium_threshold = 500
-
-# Define a function to classify activity
-def classify_activity(values):
+# Define a function to classify activity, as well as putting the low and medium threshold
+def classify_activity(values ,low_threshold, medium_threshold):
     categories = np.where(np.abs(values) < low_threshold, 1,
                            np.where(np.abs(values) < medium_threshold, 2, 3))
     return categories
@@ -76,12 +68,12 @@ forplot_datetime = datetimes[1:]
 # category_mag = classify_activity(diff_mag)
 
 fig, (ax1, ax2, ax3) = plt.subplots(3, 1, figsize=(6, 6))
-
 timestamps = [mdates.date2num(dt) for dt in forplot_datetime]
+
 ax1.plot(timestamps, diff_x, color="b")
 
 # Classify activity for diff_x
-category_x = classify_activity(diff_x)
+category_x = classify_activity(diff_x, 300, 500)
 
 # Create a mask for low, medium, and high activity
 low_mask = category_x == 1
@@ -91,9 +83,11 @@ high_mask = category_x == 3
 # Fill between the data points based on activity
 y1 = min(diff_x)
 y2 = max(diff_x)
-ax1.fill_between(timestamps,y1,y2, where=low_mask, color="red", alpha=0.3)
+
+# highlighting the activity by coloring the graph
+ax1.fill_between(timestamps,y1,y2, where=high_mask, color="red", alpha=0.3)
 ax1.fill_between(timestamps,y1,y2, where=medium_mask, color="yellow", alpha=0.3)
-ax1.fill_between(timestamps,y1,y2, where=high_mask, color="green", alpha=0.3)
+ax1.fill_between(timestamps,y1,y2, where=low_mask, color="green", alpha=0.3)
 
 ax1.set_title('Changes in x-axis reading over time')
 ax1.set_ylabel('\u0394 X')
@@ -103,6 +97,16 @@ ax1.tick_params(axis='x', rotation=45)  # Rotate x-axis labels by 90 degrees
 
 # Plot changes in y-axis reading over time
 ax2.plot(forplot_datetime, diff_y)
+
+# Fill between the data points based on activity
+y1 = min(diff_y)
+y2 = max(diff_y)
+
+# highlighting the activity by coloring the graph
+ax2.fill_between(timestamps,y1,y2, where=high_mask, color="red", alpha=0.3)
+ax2.fill_between(timestamps,y1,y2, where=medium_mask, color="yellow", alpha=0.3)
+ax2.fill_between(timestamps,y1,y2, where=low_mask, color="green", alpha=0.3)
+
 ax2.set_title('Changes in y-axis reading over time')
 ax2.set_ylabel('\u0394 Y')
 ax2.xaxis.set_major_locator(mdates.MinuteLocator(interval=60))
@@ -111,6 +115,16 @@ ax2.tick_params(axis='x', rotation=45)  # Rotate x-axis labels by 90 degrees
 
 # Plot changes in z-axis reading over time
 ax3.plot(forplot_datetime, diff_z)
+
+# Fill between the data points based on activity
+y1 = min(diff_y)
+y2 = max(diff_y)
+
+# highlighting the activity by coloring the graph
+ax3.fill_between(timestamps,y1,y2, where=high_mask, color="red", alpha=0.3)
+ax3.fill_between(timestamps,y1,y2, where=medium_mask, color="yellow", alpha=0.3)
+ax3.fill_between(timestamps,y1,y2, where=low_mask, color="green", alpha=0.3)
+
 ax3.set_title('Changes in z-axis reading over time')
 ax3.set_ylabel('\u0394 Z')
 ax3.xaxis.set_major_locator(mdates.MinuteLocator(interval=60))
