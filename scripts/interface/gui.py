@@ -262,10 +262,10 @@ def run_gui():
         root.geometry(f"{int(w)}x{int(h)}+{int(x)}+{int(y)}")
 
     # Label to display the path of the loaded directory
-    loaded_directory_label = ttk.Label(root, text="")
+    loaded_directory_label = tk.Label(root, text="")
     loaded_directory_label.pack(pady=10)
 
-    loading_label = ttk.Label(root, text="")
+    loading_label = tk.Label(root, text="")
     loading_label.pack(pady=10)
 
     # Initially, only display the "Load Data" button in the middle
