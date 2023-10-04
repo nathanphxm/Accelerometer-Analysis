@@ -25,12 +25,6 @@ def plot_graph(data):
     # Convert timestamps to datetime objects
     datetimes = [datetime.fromtimestamp(ts) for ts in timestamps]
 
-    # Set labels, title, and legend
-    ax.set_xlabel('Time')
-    ax.set_ylabel('Acceleration Value')
-    ax.set_title('Accelerometer Data Over Time')
-    ax.legend()
-
     # Define a function to classify activity, as well as putting the low and medium threshold
     def classify_activity(values ,low_threshold, medium_threshold):
         categories = np.where(np.abs(values) < low_threshold, 1,

@@ -73,7 +73,7 @@ timestamps = [mdates.date2num(dt) for dt in forplot_datetime]
 ax1.plot(timestamps, diff_x, color="b")
 
 # Classify activity for diff_x
-category_x = classify_activity(diff_x, 300, 500)
+category_x = classify_activity(diff_x, 100, 300)
 
 # Create a mask for low, medium, and high activity
 low_mask = category_x == 1
@@ -96,7 +96,15 @@ ax1.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M'))
 ax1.tick_params(axis='x', rotation=45)  # Rotate x-axis labels by 90 degrees
 
 # Plot changes in y-axis reading over time
-ax2.plot(forplot_datetime, diff_y)
+ax2.plot(forplot_datetime, diff_y, color="b")
+
+# Classify activity for diff_x
+category_y = classify_activity(diff_y, 100, 300)
+
+# Create a mask for low, medium, and high activity
+low_mask = category_y == 1
+medium_mask = category_y == 2
+high_mask = category_y == 3
 
 # Fill between the data points based on activity
 y1 = min(diff_y)
@@ -114,7 +122,15 @@ ax2.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M'))
 ax2.tick_params(axis='x', rotation=45)  # Rotate x-axis labels by 90 degrees
 
 # Plot changes in z-axis reading over time
-ax3.plot(forplot_datetime, diff_z)
+ax3.plot(forplot_datetime, diff_z, color="b")
+
+# Classify activity for diff_x
+category_z = classify_activity(diff_z, 100, 300)
+
+# Create a mask for low, medium, and high activity
+low_mask = category_z == 1
+medium_mask = category_z == 2
+high_mask = category_z == 3
 
 # Fill between the data points based on activity
 y1 = min(diff_y)
