@@ -89,7 +89,7 @@ def color_by_activity(activity):
     else:
         return 'red'
     
-
+# function to plot graph of processed frequency data
 def plot_graph(freq_data):
     
     # Extract x-axis (time) and y-axis (frequency) data
