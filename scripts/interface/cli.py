@@ -48,10 +48,46 @@ def load_data_dir(dir):
             
     
 def load_data_file(file):
-    print("Loading data...")
-    print(file)
+    print("Analysing file: " + file)
     accelerometer_data, gps_data = process_file(file)
-    print(gps_data)
+    choice = input("[P]rint data to console, [E]xport data to CSV, [R]eturn to menu or e[X]it? ").lower()
+
+    if choice == "p":
+        print_type = input("[A]ccelerometer data only, [G]PS data only, or [B]oth? ").lower()
+        
+        if print_type == "a":
+            print(accelerometer_data)
+        if print_type == "g":
+            print(gps_data)
+        if print_type == "b":
+            print(accelerometer_data)
+            print(gps_data)
+    if choice == "e":
+        base_filename = file.split("/")[-1].split(".")[0]
+        export_type = input("[A]ccelerometer data only or [G]PS data only? ").lower()
+        
+        if export_type == "a":
+            print("Exporting accelerometer data...")
+            filename = base_filename + "_accel.csv"
+            with open(filename, "w") as file:
+                writer = csv.writer(file)
+                writer.writerow(["Timestamp", "Interval", "ACCEL_X", "ACCEL_Y", "ACCEL_Z"])
+                writer.writerows(accelerometer_data)
+            print("Exported accelerometer data to " + filename)
+            sys.exit()
+        if export_type == "g":
+            print("Exporting GPS data...")
+            filename = base_filename + "_gps.csv"
+            with open(filename, "w") as file:
+                writer = csv.writer(file)
+                writer.writerow(["Latitude", "Longitude", "Day", "Month", "Year", "Hour", "Minute", "Second"])
+                writer.writerows(gps_data)
+            print("Exported GPS data to " + filename)
+            sys.exit()
+    if choice == "r":
+        run_cli()
+    if choice == "x":
+        sys.exit()
 
 
 def run_cli():
