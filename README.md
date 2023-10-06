@@ -121,4 +121,3 @@ Similar to above, you can drag in a folder or an individual file into the prompt
 
 ![Drag a folder worth of data into the prompt](https://github.com/nathanphxm/Accelerometer-Analysis/blob/f5564f394473758a5b7e6434a34b5d2e19121c6d/docs/drag-for-path-2.gif)
 
-[...]
