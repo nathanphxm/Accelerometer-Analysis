@@ -4,7 +4,9 @@
 
 import matplotlib.pyplot as plt
 from datetime import datetime
+import matplotlib.dates as mdates
 
+# function to read and process gps file into useable format
 def read_gps_file(filename):
     formatted_data = []
 
@@ -22,6 +24,7 @@ gps_data = read_gps_file('../../../paddock_data/green131_gps0459_file011_gps.txt
 #gps_data = read_gps_file('../../../paddock_data/pink181_gps1032_file011_gps.txt')
 #gps_data = read_gps_file('../../../paddock_data/yellow133_gps1098_file011_gps.txt')
 
+# function to filter out time selection
 def get_filtered_data(month, day=None, hour=None, minute=None, second=None):
     filtered_data = []
 
@@ -32,8 +35,6 @@ def get_filtered_data(month, day=None, hour=None, minute=None, second=None):
             filtered_data.append(line)
 
     return filtered_data
-
-import matplotlib.dates as mdates
 
 if __name__ == "__main__":
     month = '2'

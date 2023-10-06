@@ -3,12 +3,16 @@
 # The main function of this code is to calculate the frequency of movement per minute and visualise it.
 # The difference value to detect the movement is adjustable to determine the resolution of detection.
 
-import datetime
+import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
+from datetime import datetime
 
+# funtion to change timestamp to normal datetime
 def parse_timestamp(unix_timestamp):
-    timestamp = datetime.datetime.fromtimestamp(unix_timestamp)
+    timestamp = datetime.fromtimestamp(unix_timestamp)
     return timestamp.year, timestamp.month, timestamp.day, timestamp.hour, timestamp.minute, timestamp.second
 
+# function to read and process file into useable format
 def read_file(filename):
     formatted_data = [['Year', 'Month', 'Day', 'Hour', 'Minutes', 'Seconds', 'Index', 'X', 'Y', 'Z']]
     
@@ -28,6 +32,7 @@ def read_file(filename):
 file_data = read_file('../../../paddock_data/pink181_gps1032_file011_clean.txt')
 #file_data = read_file('../../../paddock_data/yellow133_gps1098_file011_clean.txt')
 
+# function to filter out time selection
 def get_filtered_data(month, day=None, hour=None, minute=None, second=None):
     filtered_data = [['Index', 'X', 'Y', 'Z']]
     
@@ -39,6 +44,7 @@ def get_filtered_data(month, day=None, hour=None, minute=None, second=None):
     
     return filtered_data
 
+# function to calculate frequency of movement
 def calculate_frequency(data):
     frequency = 0
     previous_values = [None, None, None]
@@ -55,6 +61,7 @@ def calculate_frequency(data):
     
     return frequency
 
+# function to calculate frequency of movement every second per day
 def frequency_per_day_by_second(month, day):
     frequencies = [["Time", "Frequency of movement"]]
     
@@ -68,6 +75,7 @@ def frequency_per_day_by_second(month, day):
     
     return frequencies
 
+# function to calculate frequency of movement every minute per day
 def frequency_per_day_by_minute(month, day):
     frequencies = [["Time", "Frequency of movement"]]
     
@@ -80,6 +88,7 @@ def frequency_per_day_by_minute(month, day):
         print(frequencies)
     return frequencies
 
+# function to calculate frequency of movement every hour per day
 def frequency_per_day_by_hour(month, day):
     frequencies = [["Hour", "Frequency of movement"]]
     
@@ -96,34 +105,6 @@ if __name__ == "__main__":
     
     freq = frequency_per_day_by_minute(month, day)
     print(freq)
-
-    #x_frequencies = frequency_per_day_by_minute(month, day, 1)  # X-axis index
-    #y_frequencies = frequency_per_day_by_minute(month, day, 2)  # Y-axis index
-    #z_frequencies = frequency_per_day_by_minute(month, day, 3)  # Z-axis index    
-
-    # x_frequencies = frequency_per_day_by_hour(month, day, 1)  # X-axis index
-    # y_frequencies = frequency_per_day_by_hour(month, day, 2)  # Y-axis index
-    # z_frequencies = frequency_per_day_by_hour(month, day, 3)  # Z-axis index
-
-    # x_frequencies = frequency_per_day_by_second(month, day, 1)  # X-axis index
-    # y_frequencies = frequency_per_day_by_second(month, day, 2)  # Y-axis index
-    # z_frequencies = frequency_per_day_by_second(month, day, 3)  # Z-axis index
-
-    # print("X-axis Frequencies per Day")
-    # for freq in x_frequencies:
-    #     print(freq)
-    
-    # print("Y-axis Frequencies per Day:")
-    # for freq in y_frequencies:
-    #     print(freq)
-    
-    # print("Z-axis Frequencies per Day:")
-    # for freq in z_frequencies:
-    #     print(freq)
-
-import matplotlib.pyplot as plt
-import matplotlib.dates as mdates
-from datetime import datetime
 
 month = 2
 day = 19
