@@ -4,6 +4,13 @@ import matplotlib.dates as mdates
 from datetime import datetime, timedelta
 import pandas as pd
 
+# Define a function to classify activity, as well as putting the low and medium threshold
+def classify_activity(values ,low_threshold, medium_threshold):
+    categories = np.where(np.abs(values) < low_threshold, 1,
+                        np.where(np.abs(values) < medium_threshold, 2, 3))
+    return categories
+
+
 def plot_graph(data):
     """
     Plot the accelerometer data.
@@ -17,27 +24,19 @@ def plot_graph(data):
     """
 
     # Extract the data into separate lists for easier plotting
-    timestamps = [row[0] + row[1] * 0.001 for row in data] # Convert to unique time using interval (assuming interval is in milliseconds)
-    accel_x = [row[2] for row in data]
-    accel_y = [row[3] for row in data]
-    accel_z = [row[4] for row in data]
+    timestamps = np.array([row[0] for row in data])
+    accel_x = np.array([row[2] for row in data])
+    accel_y = np.array([row[3] for row in data])
+    accel_z = np.array([row[4] for row in data])
+    magnitude = np.sqrt(accel_x**2 + accel_y**2 + accel_z**2)
 
     # Convert timestamps to datetime objects
     datetimes = [datetime.fromtimestamp(ts) for ts in timestamps]
 
-    # Define a function to classify activity, as well as putting the low and medium threshold
-    def classify_activity(values ,low_threshold, medium_threshold):
-        categories = np.where(np.abs(values) < low_threshold, 1,
-                            np.where(np.abs(values) < medium_threshold, 2, 3))
-        return categories
-
-
-    #xs, ys, zs, magnitude, iter = filter_hour(11,12)
-
     # difference of acceleration and magnitude
-    diff_x = np.diff(xs)
-    diff_y = np.diff(ys)
-    diff_z = np.diff(zs)
+    diff_x = np.diff(accel_x)
+    diff_y = np.diff(accel_y)
+    diff_z = np.diff(accel_z)
     diff_mag = np.diff(magnitude)
     forplot_datetime = datetimes[1:]
 
@@ -131,4 +130,4 @@ def plot_graph(data):
     plt.tight_layout()
     plt.show()
 
-    return fig
+    return fig, data
