@@ -4,6 +4,10 @@ import matplotlib.dates as mdates
 from datetime import datetime, timedelta
 import pandas as pd
 
+# Base threshold for activity classification,
+LOW_THRESHOLD = 300
+MEDIUM_THRESHOLD = 500
+
 # Define a function to classify activity, as well as putting the low and medium threshold
 def classify_activity(values ,low_threshold, medium_threshold):
     categories = np.where(np.abs(values) < low_threshold, 1,
@@ -12,16 +16,6 @@ def classify_activity(values ,low_threshold, medium_threshold):
 
 
 def plot_graph(data):
-    """
-    Plot the accelerometer data.
-    
-    Parameters:
-    - data: List of lists/tuples containing accelerometer data of the form:
-            [[Timestamp, Interval, ACCEL_X, ACCEL_Y, ACCEL_Z], ...]
-
-    Returns:
-    - fig: Matplotlib figure object
-    """
 
     # Extract the data into separate lists for easier plotting
     timestamps = [row[0] for row in data]
@@ -52,7 +46,7 @@ def plot_graph(data):
     ax1.plot(timestamps, diff_x, color="b")
 
     # Classify activity for diff_x
-    category_x = classify_activity(diff_x, 300, 500)
+    category_x = classify_activity(diff_x, LOW_THRESHOLD, MEDIUM_THRESHOLD)
 
     # Create a mask for low, medium, and high activity
     low_mask = category_x == 1
@@ -77,6 +71,14 @@ def plot_graph(data):
     # Plot changes in y-axis reading over time
     ax2.plot(forplot_datetime, diff_y, color="b")
 
+    # Classify activity for diff_x
+    category_y = classify_activity(diff_y, LOW_THRESHOLD, MEDIUM_THRESHOLD)
+
+    # Create a mask for low, medium, and high activity
+    low_mask = category_y == 1
+    medium_mask = category_y == 2
+    high_mask = category_y == 3
+
     # Fill between the data points based on activity
     y1 = min(diff_y)
     y2 = max(diff_y)
@@ -95,6 +97,14 @@ def plot_graph(data):
     # Plot changes in z-axis reading over time
     ax3.plot(forplot_datetime, diff_z, color="b")
 
+    # Classify activity for diff_x
+    category_z = classify_activity(diff_z, LOW_THRESHOLD, MEDIUM_THRESHOLD)
+
+    # Create a mask for low, medium, and high activity
+    low_mask = category_z == 1
+    medium_mask = category_z == 2
+    high_mask = category_z == 3
+
     # Fill between the data points based on activity
     y1 = min(diff_y)
     y2 = max(diff_y)
@@ -110,20 +120,12 @@ def plot_graph(data):
     ax3.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M'))
     ax3.tick_params(axis='x', rotation=45)  # Rotate x-axis labels by 90 degrees
 
-    # # Plot changes in magnitude over time
-    # ax4.plot(forplot_datetime, diff_mag)
-    # ax4.set_title('Changes in magnitude over time')
-    # ax4.set_ylabel('\u0394 Magnitude')
-    # ax4.xaxis.set_major_locator(mdates.MinuteLocator(interval=60))
-    # ax4.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M'))
-    # ax4.tick_params(axis='x', rotation=45)  # Rotate x-axis labels by 90 degrees
-
-    # Set the x-axis limits for all subplots (you can customize these limits)
-    xmin = datetime(datetimes[0])
-    xmax = datetime(datetimes[-1])
-    ax1.set_xlim(xmin, xmax)
-    ax2.set_xlim(xmin, xmax)
-    ax3.set_xlim(xmin, xmax)
+    # # Set the x-axis limits for all subplots
+    # xmin = min(datetimes)
+    # xmax = max(datetimes)
+    # ax1.set_xlim(xmin, xmax)
+    # ax2.set_xlim(xmin, xmax)
+    # ax3.set_xlim(xmin, xmax)
 
     plt.tight_layout()
 
