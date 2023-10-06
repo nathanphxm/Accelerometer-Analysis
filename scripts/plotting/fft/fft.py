@@ -1,3 +1,11 @@
+'''
+This script runs the Fast Fourier Transform of the acceleration data on x, y, and z axis. 
+The input is one day worth of data. 
+Calculation is based on the this reference: https://www.alphabold.com/fourier-transform-in-python-vibration-analysis/
+The calculation is then used to plot a FFT graph showing amplitude of FFT signal against frequency domain
+'''
+
+
 import numpy as np
 import matplotlib.pyplot as plt
 from datetime import datetime, timedelta
@@ -10,6 +18,7 @@ times, xs, ys, zs, iter = [], [], [], [], []
 magnitude = []
 for_mean = []
 
+# file reading
 for line in lines:
     timestamp, iteration, x, y, z = map(int, line.split(","))
     # Convert timestamp and iteration into continuous time
@@ -28,58 +37,20 @@ print(datetimes[0])
 time_diff = (datetimes[-1] - datetimes[0]).total_seconds() / (len(datetimes) - 1)
 print(time_diff)
 
-sample = len(datetimes)
-
-def plot_fft(time,axis,sample_rate,direction):
-    # This returns the fourier transform coeficients as complex numbers
-    transformed_axis = np.fft.fft(axis)
-
-    # Take the absolute value of the complex numbers for magnitude spectrum
-    freqs_magnitude = np.abs(transformed_axis)
-
-    # Create frequency x-axis that will span up to sample_rate
-    freq_axis = np.linspace(0, sample//2, num = len(freqs_magnitude))
-
-    # Plot frequency domain
-    plt.plot(freq_axis, freqs_magnitude)
-    plt.title("FFT of "+direction)
-    plt.xlabel("Frequency (Hz)")
-    plt.ylabel("Magnitude")
-    plt.xlim(0, 100)
-    plt.show()
-
-# plot_fft(datetimes,xs,sample_rate,"x")
-# plot_fft(datetimes,ys,sample_rate,"y")
-# plot_fft(datetimes,zs,sample_rate,"z")
-
-
-def plot_fft2(axis):
-    axis -= np.mean(axis)
-    fft = np.fft.fft(axis)
-    fftfreq = np.fft.fftfreq(len(axis))
-    plt.ylabel("Amplitude")
-    plt.xlabel("Frequency [Hz]")
-    plt.plot(fftfreq[fftfreq>=0], np.abs(fft)[fftfreq>=0])
-    plt.show()
-
-# plot_fft2(xs)
-# plot_fft2(ys)
-# plot_fft2(zs)
-
-#source: https://www.alphabold.com/fourier-transform-in-python-vibration-analysis/
+# calculating average sampling rate throughout the day
 for i in range(len(iter)-1):
     if(iter[i+1]<iter[i]):
         for_mean.append(iter[i])
-
-
 avg_sample_rate = np.mean(for_mean)
+
+#function to plot FFT graph from the given set of data
 def fft_plot3(axis,direction):
-    sample_rate = avg_sample_rate
+    sample_rate = avg_sample_rate # average sampling rate
     total_second = (datetimes[-1] - datetimes[0]).total_seconds()
     N = sample_rate*total_second
-    frequency = np.linspace(0.0, (sample_rate/2), int (N/2))
+    frequency = np.linspace(0.0, (sample_rate/2), int (N/2)) # forming the frequency domain
 
-    freq_data = fft(axis)
+    freq_data = fft(axis) # performing FFT to the data
     y = 2/N * np.abs (freq_data [0: int(N/2)])
     #y = y - np.mean(y)
 
@@ -94,4 +65,4 @@ def fft_plot3(axis,direction):
 # fft_plot3(ys,"y")
 # fft_plot3(zs,"z")
 # fft_plot3(magnitude,"total magnitude")
-# check: https://stackoverflow.com/questions/69356006/fast-fourier-transform-of-subset-of-vibration-dataset
+# source: https://www.alphabold.com/fourier-transform-in-python-vibration-analysis/

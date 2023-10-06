@@ -30,8 +30,9 @@ accel_y_vector = np.array(ys)
 accel_z_vector = np.array(zs)
 
 # Calculate pitch and roll angles
+# source: https://www.thierry-lequeu.fr/data/AN3461.pdf
 pitch = np.arctan2(accel_x_vector, np.sqrt(accel_y_vector**2 + accel_z_vector**2))
-roll = np.arctan2(-accel_y_vector, accel_z_vector)
+roll = np.arctan2(accel_y_vector, np.sqrt(accel_x_vector**2 + accel_z_vector**2))
 
 # Convert radians to degrees
 pitch_deg = np.degrees(pitch)
