@@ -13,7 +13,7 @@ def plot_graph(data):
     """
 
     # Extract the data into separate lists for easier plotting
-    timestamps = [row[0] + row[1] * 0.001 for row in data] # Convert to unique time using interval (assuming interval is in milliseconds)
+    timestamps = [row[0] + (row[1]-1) * (1.0/max([x[1] for x in data if x[0] == row[0]])) for row in data]
     accel_x = [row[2] for row in data]
     accel_y = [row[3] for row in data]
     accel_z = [row[4] for row in data]
@@ -30,9 +30,6 @@ def plot_graph(data):
     ax.set_xlabel('Time')
     ax.set_ylabel('Acceleration Value')
     ax.set_title('Accelerometer Data Over Time')
-    ax.legend()
-
-    # Display the plot
-    plt.show()
+    ax.legend(loc='upper left')
 
     return fig
