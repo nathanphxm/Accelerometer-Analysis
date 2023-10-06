@@ -24,11 +24,10 @@ def plot_graph(data):
     """
 
     # Extract the data into separate lists for easier plotting
-    timestamps = np.array([row[0] for row in data])
-    accel_x = np.array([row[2] for row in data])
-    accel_y = np.array([row[3] for row in data])
-    accel_z = np.array([row[4] for row in data])
-    magnitude = np.sqrt(accel_x**2 + accel_y**2 + accel_z**2)
+    timestamps = [row[0] for row in data]
+    accel_x = np.array([row[2] for row in data]).astype(float)  # Convert to numeric type
+    accel_y = np.array([row[3] for row in data]).astype(float)
+    accel_z = np.array([row[4] for row in data]).astype(float)
 
     # Convert timestamps to datetime objects
     datetimes = [datetime.fromtimestamp(ts) for ts in timestamps]
@@ -37,7 +36,7 @@ def plot_graph(data):
     diff_x = np.diff(accel_x)
     diff_y = np.diff(accel_y)
     diff_z = np.diff(accel_z)
-    diff_mag = np.diff(magnitude)
+
     forplot_datetime = datetimes[1:]
 
 
@@ -76,7 +75,7 @@ def plot_graph(data):
     ax1.tick_params(axis='x', rotation=45)  # Rotate x-axis labels by 90 degrees
 
     # Plot changes in y-axis reading over time
-    ax2.plot(forplot_datetime, diff_y)
+    ax2.plot(forplot_datetime, diff_y, color="b")
 
     # Fill between the data points based on activity
     y1 = min(diff_y)
@@ -94,7 +93,7 @@ def plot_graph(data):
     ax2.tick_params(axis='x', rotation=45)  # Rotate x-axis labels by 90 degrees
 
     # Plot changes in z-axis reading over time
-    ax3.plot(forplot_datetime, diff_z)
+    ax3.plot(forplot_datetime, diff_z, color="b")
 
     # Fill between the data points based on activity
     y1 = min(diff_y)
@@ -120,14 +119,12 @@ def plot_graph(data):
     # ax4.tick_params(axis='x', rotation=45)  # Rotate x-axis labels by 90 degrees
 
     # Set the x-axis limits for all subplots (you can customize these limits)
-    xmin = datetime(datetimes[0].year, datetimes[0].month, datetimes[0].day, 0, 0)
-    xmax = datetime(datetimes[0].year, datetimes[0].month, datetimes[0].day, 23, 59)
+    xmin = datetime(datetimes[0])
+    xmax = datetime(datetimes[-1])
     ax1.set_xlim(xmin, xmax)
     ax2.set_xlim(xmin, xmax)
     ax3.set_xlim(xmin, xmax)
-    # ax4.set_xlim(xmin, xmax)
 
     plt.tight_layout()
-    plt.show()
 
-    return fig, data
+    return fig
