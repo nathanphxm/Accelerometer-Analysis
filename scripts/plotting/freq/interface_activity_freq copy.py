@@ -7,29 +7,38 @@
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 from datetime import datetime
-from datetime import timedelta
 import csv
 
-def get_start_end_time(data):
-    start_time = datetime.fromtimestamp(data[0][0])
-    end_time = datetime.fromtimestamp(data[-1][0])
-    return start_time, end_time
+# funtion to change timestamp to normal datetime
+def parse_timestamp(unix_timestamp):
+    timestamp = datetime.fromtimestamp(unix_timestamp)
+    return timestamp.year, timestamp.month, timestamp.day, timestamp.hour, timestamp.minute, timestamp.second
+
+# function to read and process file into useable format
+def read_file(filename):
+    formatted_data = [['Year', 'Month', 'Day', 'Hour', 'Minutes', 'Seconds', 'Index', 'X', 'Y', 'Z']]
+    
+    with open(filename, 'r') as file:
+        lines = file.readlines()
+        
+        for line in lines:
+            col = line.strip().split(',')
+            year, month, day, hour, minutes, seconds = parse_timestamp(int(col[0]))
+            formatted_line = [year, month, day, hour, minutes, seconds] + col[1:]
+            formatted_data.append(formatted_line)
+    
+    return formatted_data
 
 # function to filter out time selection
-def get_filtered_data(data, current_time):
+def get_filtered_data(file_data, month, day=None, hour=None, minute=None, second=None):
     filtered_data = [['Index', 'X', 'Y', 'Z']]
-    next_minute = current_time + timedelta(minutes = 1)
-
-    def filter_minute(line):
-        timestamp = datetime.fromtimestamp(line[0])
-        if timestamp>=current_time and timestamp<next_minute:
-            return True
-        return False 
     
-    filtered = filter(filter_minute, data)
-    filtered_min = map(lambda x: x[1:], filtered)
-    filtered_data += filtered_min
-
+    for line in file_data[1:]:
+        if line[1] == month and (day is None or line[2] == day) and \
+           (hour is None or line[3] == hour) and (minute is None or line[4] == minute) and \
+           (second is None or line[5] == second):
+            filtered_data.append(line[6:])
+    
     return filtered_data
 
 # function to calculate frequency of movement
@@ -50,23 +59,16 @@ def calculate_frequency(data):
     return frequency
 
 # function to calculate frequency of movement per minute
-def frequency_per_day_by_minute(data):
+def frequency_per_day_by_minute(file_data, month, day):
     frequencies = [["Time", "Frequency of movement"]]
     
-    start_time, end_time = get_start_end_time(data)
-    current_time = start_time
-
-    while current_time <= end_time:
-
-        print(current_time)
-        
-        filtered_data = get_filtered_data(data, current_time)
-        frequency = calculate_frequency(filtered_data)
-        time_str = current_time
-        frequencies.append([time_str, frequency])
-
-        current_time += timedelta(minutes = 1)
-    
+    for hour in range(24):
+        for minute in range(60):
+            data = get_filtered_data(file_data, month, day, hour, minute)
+            frequency = calculate_frequency(data)  
+            time_str = f"{month}/{day} {hour:02d}:{minute:02d}"
+            frequencies.append([time_str, frequency])
+        print(frequencies)
     return frequencies
 
 # function to classify different activity level
@@ -88,17 +90,18 @@ def color_by_activity(activity):
         return 'red'
     
 # function to plot graph of processed frequency data
-def plot_graph(data):
-
-    freq_data = frequency_per_day_by_minute(data)
+def plot_graph(freq_data):
     
     # Extract x-axis (time) and y-axis (frequency) data
-    time = [entry[0] for entry in freq_data[1:]]  # Skipping the header row
+    time_str = [entry[0] for entry in freq_data[1:]]  # Skipping the header row
     cumulative_freq = 0
     frequency = []
     for entry in freq_data[1:]:
         cumulative_freq += entry[1]
         frequency.append(cumulative_freq)
+
+    # Convert time strings to datetime objects
+    time = [datetime.strptime(ts, "%m/%d %H:%M") for ts in time_str]
 
     # Define thresholds for low, moderate, and high activity
     low_activity_threshold = 500
@@ -134,12 +137,16 @@ def plot_graph(data):
 
     plt.xlabel('Time (GMT+8)')
     plt.ylabel('Cumulative Frequency of Movement')
-    plt.title(f'Cumulative Frequency of Movement by Minute')
+    plt.title(f'Cumulative Frequency of Movement on {month}/{day} by Minute')
 
     # Format the x-axis to display time at 1-hour intervals
     ax = plt.gca()
     ax.xaxis.set_major_locator(mdates.HourLocator(interval=1))
     ax.xaxis.set_major_formatter(mdates.DateFormatter("%H:%M"))
+
+    # Set the x-axis limits to 00:00 to 23:59
+    plt.xlim(datetime(time[0].year, time[0].month, time[0].day, 0, 0), 
+             datetime(time[-1].year, time[-1].month, time[-1].day, 23, 59))
 
     # Customise legend
     handles = [plt.Rectangle((0, 0), 1, 1, color=color_by_activity(act)) for act in ["Low Activity", "Moderate Activity", "High Activity"]]
@@ -152,3 +159,22 @@ def plot_graph(data):
     plt.tight_layout()
 
     return fig
+
+# run all functions required to calculate cumulative frequency, categorise activity level and visualise them
+if __name__ == "__main__":
+
+    # choose file required to be calculated and visualised
+    #file_data = read_file('../../../resources/file011_clean.txt')
+    #file_data = read_file('../../../paddock_data/green131_gps0459_file011_clean.txt')
+    #file_data = read_file('../../../paddock_data/pink181_gps1032_file011_clean.txt')
+    file_data = read_file('../../../paddock_data/yellow133_gps1098_file011_clean.txt')
+
+    month = 2
+    day = 19
+    freq_data = frequency_per_day_by_minute(file_data, month, day) ### put into plot_graph function
+
+    fig = plot_graph(freq_data)
+
+    plt.show()
+
+    
