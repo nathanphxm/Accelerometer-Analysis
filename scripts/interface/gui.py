@@ -5,7 +5,7 @@ import tkinter as tk
 from tkinter import ttk  # For the Combobox widget
 from tkinter import filedialog
 from tkinter import messagebox
-from ttkthemes import ThemedTk
+# from ttkthemes import ThemedTk
 import importlib
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from process_data import process_directory
@@ -18,17 +18,53 @@ PLOTTING_DIR = os.path.join(os.path.dirname(__file__), "..", "plotting")
 load_data_button = None
 start_datetime = None
 end_datetime = None
+canvas_frame = None
+ui_frame = None
 accelerometer_data = []
 gps_data = []
 data_from_graph = []
 GMT8 = timezone(timedelta(hours=8))
 
+def styled_button(master, **kwargs):
+    BUTTON_COLOR = "#3F51B5"
+    BUTTON_FOREGROUND = "#FFFFFF"
+    HOVER_COLOR = "#303F9F"
+    #3F51B5
+    
+    button = tk.Button(
+        master, 
+        font=("Open Sans", 12, "bold"), 
+        bg=BUTTON_COLOR, 
+        fg=BUTTON_FOREGROUND, 
+        borderwidth=0, 
+        padx=15, 
+        pady=2, 
+        highlightthickness=0, 
+        activebackground=BUTTON_COLOR, 
+        activeforeground=BUTTON_FOREGROUND,
+        cursor="hand2",
+        **kwargs
+    )
+
+    # Event handlers for hover effect
+    def on_hover(event):
+        button.config(bg=HOVER_COLOR)
+
+    def on_leave(event):
+        button.config(bg=BUTTON_COLOR)
+    
+    # Bind the events
+    button.bind("<Enter>", on_hover)
+    button.bind("<Leave>", on_leave)
+
+    return button
+
 def load_data():
-    global load_data_button, loaded_directory_label, loading_label, accelerometer_data, gps_data
+    global load_data_button, loading_label, accelerometer_data, gps_data
     directory = filedialog.askdirectory()  # Open directory selection dialog
     if directory:
         #show that data is loading
-        loading_label.config(text="Processing data, please wait...", fg="red")
+        loading_label.config(text="Processing data, please wait...", fg="white")
         root.update_idletasks()  # Process all pending GUI tasks
         root.config(cursor="wait")
         root.update()  # Update the GUI
@@ -43,7 +79,7 @@ def load_data():
 
         # If a directory is selected, hide the load_data_button and display the rest of the GUI components
         load_data_button.pack_forget()
-        loaded_directory_label.config(text=f"Current Directory: {directory}")
+        loading_label.config(text=f"Current Directory: {directory}")
         display_gui_components()
 
 def get_datetime_popup(initial_datetime=None, min_datetime=None, max_datetime=None):
@@ -118,10 +154,10 @@ def get_datetime_popup(initial_datetime=None, min_datetime=None, max_datetime=No
     def on_cancel():
         popup.destroy()
 
-    ok_button = ttk.Button(popup, text="OK", command=on_ok)
+    ok_button = styled_button(popup, text="OK", command=on_ok)
     ok_button.pack(side=tk.LEFT, padx=10, pady=10)
 
-    cancel_button = ttk.Button(popup, text="Cancel", command=on_cancel)
+    cancel_button = styled_button(popup, text="Cancel", command=on_cancel)
     cancel_button.pack(side=tk.RIGHT, padx=10, pady=10)
 
     popup.grab_set()  # Makes the popup modal
@@ -129,9 +165,7 @@ def get_datetime_popup(initial_datetime=None, min_datetime=None, max_datetime=No
     return getattr(popup, 'selected_datetime', None)
 
 def display_gui_components():
-    # Frame for top buttons
-    top_frame = tk.Frame(root)
-    top_frame.pack(side=tk.TOP, fill=tk.X)
+    global ui_frame
 
     min_datetime = datetime.fromtimestamp(accelerometer_data[0][0], GMT8)
     max_datetime = datetime.fromtimestamp(accelerometer_data[-1][0], GMT8)
@@ -146,7 +180,7 @@ def display_gui_components():
             start_datetime_button.selected_datetime = selected_datetime
             start_datetime = selected_datetime  # Update the global variable
 
-    start_datetime_button = ttk.Button(top_frame, text="Set Start Date & Time", command=set_start_datetime)
+    start_datetime_button = styled_button(ui_frame, text="Set Start Date & Time", command=set_start_datetime)
     start_datetime_button.pack(side=tk.LEFT, padx=5, pady=10)
 
     # End date and time button
@@ -159,11 +193,11 @@ def display_gui_components():
             end_datetime_button.selected_datetime = selected_datetime
             end_datetime = selected_datetime  # Update the global variable
 
-    end_datetime_button = ttk.Button(top_frame, text="Set End Date & Time", command=set_end_datetime)
+    end_datetime_button = styled_button(ui_frame, text="Set End Date & Time", command=set_end_datetime)
     end_datetime_button.pack(side=tk.LEFT, padx=5, pady=10)
 
     # Create a Combobox
-    combobox = ttk.Combobox(top_frame)
+    combobox = ttk.Combobox(ui_frame)
     combobox.pack(side=tk.LEFT, pady=20, padx=20)
 
     # Populate Combobox with Python scripts from all subdirectories in the plotting folder
@@ -177,16 +211,18 @@ def display_gui_components():
     combobox['values'] = scripts
 
     # Button to display graph
-    btn = ttk.Button(top_frame, text="Display Graph", command=lambda: display_graph(combobox))
+    btn = styled_button(ui_frame, text="Display Graph", command=lambda: display_graph(combobox))
     btn.pack(side=tk.RIGHT, padx=5, pady=10)
 
     # Button to print data
-    print_button = ttk.Button(top_frame, text="Print Data", command=print_data)
+    print_button = styled_button(ui_frame, text="Print Data", command=print_data)
     print_button.pack(side=tk.RIGHT, padx=5, pady=10)
 
 def print_data():
     global accelerometer_data
-    
+    print(accelerometer_data[0])
+    print(accelerometer_data[1])
+    print(accelerometer_data[2])
      # Check if timestamps are selected
     if start_datetime is None or end_datetime is None:
         messagebox.showwarning("Warning", "Please select both start and end timestamps before printing.")
@@ -229,7 +265,6 @@ def display_graph(combobox):
 
     # Filter the accelerometer data based on the selected time range
     filtered_data = [data for data in accelerometer_data if start_ts <= data[0] <= end_ts]
-    print(len(filtered_data))
     fig = plot_module.plot_graph(filtered_data)
 
     # Remove the old canvas (if it exists)
@@ -237,7 +272,7 @@ def display_graph(combobox):
         current_canvas.get_tk_widget().destroy()
         
     # Embed the new figure in the tkinter window
-    canvas = FigureCanvasTkAgg(fig, master=root)
+    canvas = FigureCanvasTkAgg(fig, master=canvas_frame)
     canvas_widget = canvas.get_tk_widget()
     canvas_widget.pack(side=tk.TOP, fill=tk.BOTH, expand=1)
     canvas.draw()
@@ -246,10 +281,18 @@ def display_graph(combobox):
     current_canvas = canvas
 
 def run_gui():
-    global load_data_button, loaded_directory_label, loading_label
+    global load_data_button, loading_label
+    global canvas_frame, ui_frame
     global root
-    # root = tk.Tk()
-    root = ThemedTk(theme="arc")
+    root = tk.Tk()
+    # root = ThemedTk(theme="arc")
+
+        # Frame for top buttons
+    ui_frame = tk.Frame(root)
+    ui_frame.pack(side=tk.TOP, fill=tk.X)
+    ui_frame.config(bg="#E0E0E0")
+
+    root.config(bg='#E0E0E0')
 
     # Maximizing the window based on the platform
     if sys.platform == "win32":
@@ -262,16 +305,16 @@ def run_gui():
         root.geometry(f"{int(w)}x{int(h)}+{int(x)}+{int(y)}")
 
     # Label to display the path of the loaded directory
-    loaded_directory_label = tk.Label(root, text="")
-    loaded_directory_label.pack(pady=10)
-
-    loading_label = tk.Label(root, text="")
+    loading_label = tk.Label(ui_frame, text="", bg="#E0E0E0")
     loading_label.pack(pady=10)
 
     # Initially, only display the "Load Data" button in the middle
-    load_data_button = ttk.Button(root, text="Load Data", command=load_data)
+    load_data_button = styled_button(ui_frame, text="Load Data", command=load_data)
     load_data_button.pack(pady=20)
-
+    
+    canvas_frame = tk.Frame(root, bg='white')
+    canvas_frame.pack(side=tk.TOP, fill=tk.BOTH, expand=1, pady=10)
+    
     root.mainloop()
 
 current_canvas = None
