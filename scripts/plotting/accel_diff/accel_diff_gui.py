@@ -5,8 +5,8 @@ from datetime import datetime, timedelta
 import pandas as pd
 
 # Base threshold for activity classification,
-LOW_THRESHOLD = 300
-MEDIUM_THRESHOLD = 500
+LOW_THRESHOLD = 100
+MEDIUM_THRESHOLD = 200
 
 # Define a function to classify activity, as well as putting the low and medium threshold
 def classify_activity(values ,low_threshold, medium_threshold):
@@ -58,9 +58,9 @@ def plot_graph(data):
     y2 = max(diff_x)
 
     # highlighting the activity by coloring the graph
-    ax1.fill_between(timestamps,y1,y2, where=high_mask, color="red", alpha=0.3)
-    ax1.fill_between(timestamps,y1,y2, where=medium_mask, color="yellow", alpha=0.3)
-    ax1.fill_between(timestamps,y1,y2, where=low_mask, color="green", alpha=0.3)
+    ax1.fill_between(timestamps,y1,y2, where=high_mask, color="red", alpha=0.3, interpolate=True)
+    ax1.fill_between(timestamps,y1,y2, where=medium_mask, color="yellow", alpha=0.4, interpolate=True)
+    ax1.fill_between(timestamps,y1,y2, where=low_mask, color="green", alpha=0.5, interpolate=True)
 
     ax1.set_title('Changes in x-axis reading over time')
     ax1.set_ylabel('\u0394 X')
