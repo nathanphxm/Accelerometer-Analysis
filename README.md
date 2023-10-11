@@ -13,9 +13,10 @@ Created for CITS3200 2023 Semester 2 with love from Group 6.
 
 ### macOS
 **1. Ensure that Python 3.x is installed on the machine.**
+In Terminal, or your favourite terminal emulator:
 ```bash
 $ python3 --version
-Python 3.11.5
+Python 3.xx.x
 ```
 
 **2. Ensure next that `pip` is installed on the machine.**
@@ -30,29 +31,55 @@ $ python3 -m pip --version
 pip 23.2.1 from [...]
 ```
 
-**3. Install `tk` if not installed already.**
+If `pip` is not installed:
 
 ```bash
-$ pip3 install tk
-```
-if the above does not work, try:
-```bash
-$ python3 -m pip install tk
+$ curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
 ```
 
-**4. Install `matplotlib` if not installed already.**
+```bash
+$ python3 get-pip.py
+```
 
+**3. Ensure next that `git` is installed on the machine.**
 ```bash
-$ pip3 install matplotlib
+$ git --version
+git version 2.xx.x (Apple Git-xxx)
 ```
-if the above does not work, try:
-```bash
-$ python3 -m pip install matplotlib
-```
+
+If git is not installed, a window will display prompting you to install the _command line developer tools_. Install it from within that window.
+![Window displaying command line developer tools install prompt](https://user-images.githubusercontent.com/8599/195653334-7fde0a5e-1168-4be4-b3a2-313c6bb836b8.png)
 
 ### Linux
+In Terminal, or your favourite terminal emulator:
+**1. Ensure that Python 3.x is installed on the machine.**
+```bash
+$ python3 --version
+Python 3.xx.x
+```
+
+**2. Ensure next that `pip` is installed on the machine.**
+
+```bash
+$ pip3 --version
+pip 23.2.1 from [...]
+```
+
+If `pip` is not installed:
+
+```bash
+$ sudo apt-get update && sudo apt-get upgrade -y
+$ sudo apt-get install python3-pip -y
+```
 
 ### Windows
+In Terminal, or your favourite terminal emulator (Command Prompt may work!):
+**1. Ensure that Python 3.x is installed on the machine.**
+```powershell
+$ python3 --version
+Python 3.xx.x
+```
+Note: If Python 3.x is not currently installed on the system, a Microsoft Store window will open. Install it from that window.
 
 ## Installing the software
 
@@ -73,6 +100,16 @@ $ cd <path/to/dir>
 $ git clone https://github.com/nathanphxm/Accelerometer-Analysis
 ```
 
+4. Install prerequisite Python packages
+
+```bash
+$ pip3 install -r requirements.txt
+```
+if the above does not work, try:
+```bash
+$ python3 -m pip install -r requirements.txt
+```
+
 ### Linux
 
 1. Create an empty folder where you would like to store the program.
@@ -84,8 +121,15 @@ $ cd <path/to/dir>
 ```bash
 $ git clone https://github.com/nathanphxm/Accelerometer-Analysis
 ```
+4. Install prerequisite Python packages
+```bash
+$ pip3 install -r requirements.txt
+```
+
 
 ### Windows
+
+
 
 ## Using the software
 
