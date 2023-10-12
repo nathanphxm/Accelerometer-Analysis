@@ -1,4 +1,4 @@
-### required by client
+### cannot be executed in gui
 
 # The main function for this code is to visualise the different movement in GPS location over time.
 
