@@ -10,47 +10,63 @@ from datetime import datetime
 from datetime import timedelta
 import csv
 
-# Define thresholds for low, moderate, and high activity
-low_activity_threshold = 500
-high_activity_threshold = 1000
+def get_start_end_time(data):
+    start_time = datetime.fromtimestamp(data[0][0])
+    end_time = datetime.fromtimestamp(data[-1][0])
+    return start_time, end_time
 
-# Define frequency detecting threshold
-freq_detect_threshold = 10
+# function to filter out time selection
+def get_filtered_data(data, current_time):
+    filtered_data = [['Index', 'X', 'Y', 'Z']]
+    next_minute = current_time + timedelta(minutes = 1)
+
+    def filter_minute(line):
+        timestamp = datetime.fromtimestamp(line[0])
+        if timestamp>=current_time and timestamp<next_minute:
+            return True
+        return False 
+    
+    filtered = filter(filter_minute, data)
+    filtered_min = map(lambda x: x[1:], filtered)
+    filtered_data += filtered_min
+
+    return filtered_data
 
 # function to calculate frequency of movement
-def calculate_frequency(minute_list):
+def calculate_frequency(data):
     frequency = 0
     previous_values = [None, None, None]
     
-    for line in minute_list:
+    for line in data[1:]:
         values = [int(value) for value in line[1:4]]  # X, Y, Z values
         
         if None in previous_values:
             previous_values = values
         else:
-            if any(abs(values[i] - previous_values[i]) >= freq_detect_threshold for i in range(3)):
+            if any(abs(values[i] - previous_values[i]) >= 10 for i in range(3)):
                 frequency += 1
             previous_values = values
     
     return frequency
 
-# function to filter out time selection
-def get_freq(data):
+# function to calculate frequency of movement per minute
+def frequency_per_day_by_minute(data):
     frequencies = [["Time", "Frequency of movement"]]
-    current_time = datetime.fromtimestamp(data[0][0])
-    minute_list = []
+    
+    start_time, end_time = get_start_end_time(data)
+    current_time = start_time
 
-    for line in data:
-        if datetime.fromtimestamp(line[0]) < (current_time + timedelta(minutes = 1)):
-            minute_list.append(line[1:])
-        else:
-            frequency = calculate_frequency(minute_list)
-            time_str = current_time
-            frequencies.append([time_str, frequency])
-            current_time += timedelta(minutes = 1)
-            print(current_time)
-            minute_list = [line[1:]]
+    while current_time <= end_time:
 
+        print(current_time)
+        
+        filtered_data = get_filtered_data(data, current_time)
+        frequency = calculate_frequency(filtered_data)
+        time_str = current_time
+        frequencies.append([time_str, frequency])
+
+        current_time += timedelta(minutes = 1)
+    
     return frequencies
 
 # function to classify different activity level
@@ -74,7 +90,7 @@ def color_by_activity(activity):
 # function to plot graph of processed frequency data
 def plot_graph(data):
 
-    freq_data = get_freq(data)
+    freq_data = frequency_per_day_by_minute(data)
     
     # Extract x-axis (time) and y-axis (frequency) data
     time = [entry[0] for entry in freq_data[1:]]  # Skipping the header row
@@ -84,9 +100,13 @@ def plot_graph(data):
         cumulative_freq += entry[1]
         frequency.append(cumulative_freq)
 
+    # Define thresholds for low, moderate, and high activity
+    low_activity_threshold = 500
+    high_activity_threshold = 1000
+
     # Create a line plot for cumulative frequency
     fig = plt.figure(figsize=(12, 6), facecolor='white')
-    plt.plot(time, frequency, marker=None, color='blue', label='Cumulative Frequency')
+    plt.plot(time, frequency, marker='o', color='blue', label='Cumulative Frequency')
 
     # Create a list to store the rows for the CSV
     csv_rows = [['Datetime', 'Frequency per Minute', 'Activity Level']]
