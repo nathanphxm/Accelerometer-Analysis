@@ -13,6 +13,7 @@ def plot_fft(axis, sample_rate, direction, ax):
     ax.set_xlabel("Frequency (Hz)")
     ax.set_ylabel("Magnitude")
     ax.set_xlim(0, 100)
+    
 
 def plot_fft2(axis, total_second, direction, ax):
     sample_rate = 25
