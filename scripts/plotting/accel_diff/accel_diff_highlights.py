@@ -10,6 +10,7 @@ import matplotlib.dates as mdates
 from datetime import datetime, timedelta
 from scipy.signal import find_peaks
 import pandas as pd
+from statistics import mean
 
 with open('./paddock_data/green131_gps0459_file011_clean.txt', 'r') as file:
     lines = file.readlines()
@@ -45,12 +46,28 @@ def filter_hour(start_hour, end_hour):
     return xs, ys, zs, magnitude, iter
 
 # Define a function to classify activity, as well as putting the low and medium threshold
-def classify_activity(values ,low_threshold, medium_threshold):
-    categories = np.where(np.abs(values) < low_threshold, 1,
-                           np.where(np.abs(values) < medium_threshold, 2, 3))
-    return categories
+# def classify_activity(values ,low_threshold, medium_threshold):
+#     categories = np.where(np.abs(values) < low_threshold, 1,
+#                            np.where(np.abs(values) < medium_threshold, 2, 3))
+#     return categories
 
+def classify_activity(frequency, low_threshold, high_threshold):
+    if frequency <= low_threshold:
+        return "Low Activity"
+    elif frequency <= high_threshold:
+        return "Moderate Activity"
+    else:
+        return "High Activity"
 
+# function to provide different colour to each activity level
+def color_by_activity(activity):
+    if activity == "Low Activity":
+        return 'blue'
+    elif activity == "Moderate Activity":
+        return 'green'
+    else:
+        return 'red'
+    
 #xs, ys, zs, magnitude, iter = filter_hour(11,12)
 
 # difference of acceleration and magnitude
@@ -67,7 +84,8 @@ forplot_datetime = datetimes[1:]
 # category_z = classify_activity(diff_z)
 # category_mag = classify_activity(diff_mag)
 
-fig, (ax1, ax2, ax3) = plt.subplots(3, 1, figsize=(6, 6))
+# #fig, (ax1, ax2, ax3) = plt.subplots(3, 1, figsize=(6, 6))
+fig, ax1 = plt.subplots(1, 1, figsize=(6, 6))
 timestamps = [mdates.date2num(dt) for dt in forplot_datetime]
 
 ax1.plot(timestamps, diff_x, color="b")
@@ -80,88 +98,93 @@ low_mask = category_x == 1
 medium_mask = category_x == 2
 high_mask = category_x == 3
 
-# Fill between the data points based on activity
-y1 = min(diff_x)
-y2 = max(diff_x)
+y1, y2 = min(diff_x),max(diff_x)
 
-# highlighting the activity by coloring the graph
-ax1.fill_between(timestamps,y1,y2, where=high_mask, color="red", alpha=0.3)
-ax1.fill_between(timestamps,y1,y2, where=medium_mask, color="yellow", alpha=0.3)
-ax1.fill_between(timestamps,y1,y2, where=low_mask, color="green", alpha=0.3)
+print(mean(category_x))
+print(max(category_x))
+# Highlighting the activity by coloring the graph
+# ax1.fill_between(timestamps, y1, y2, where=high_mask, color="red", alpha=0.3, interpolate=True)
+# ax1.fill_between(timestamps, y1, y2, where=medium_mask, color="yellow", alpha=0.3, interpolate=True)
+# ax1.fill_between(timestamps, y1, y2, where=low_mask, color="green", alpha=0.3, interpolate=True)
 
-ax1.set_title('Changes in x-axis reading over time')
-ax1.set_ylabel('\u0394 X')
-ax1.xaxis.set_major_locator(mdates.MinuteLocator(interval=60))
-ax1.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M'))
-ax1.tick_params(axis='x', rotation=45)  # Rotate x-axis labels by 90 degrees
+for i in range(len(timestamps)):
+        act_level = classify_activity(diff_x[i], 100, 300)
+        color = color_by_activity(act_level)
+        plt.fill_between([timestamps[i]], diff_x, color=color, alpha=0.3)
 
-# Plot changes in y-axis reading over time
-ax2.plot(forplot_datetime, diff_y, color="b")
+# ax1.set_title('Changes in x-axis reading over time')
+# ax1.set_ylabel('\u0394 X')
+# ax1.xaxis.set_major_locator(mdates.MinuteLocator(interval=60))
+# ax1.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M'))
+# ax1.tick_params(axis='x', rotation=45)  # Rotate x-axis labels by 90 degrees
 
-# Classify activity for diff_x
-category_y = classify_activity(diff_y, 100, 300)
+# # Plot changes in y-axis reading over time
+# ax2.plot(forplot_datetime, diff_y, color="b")
 
-# Create a mask for low, medium, and high activity
-low_mask = category_y == 1
-medium_mask = category_y == 2
-high_mask = category_y == 3
+# # Classify activity for diff_x
+# category_y = classify_activity(diff_y, 100, 300)
 
-# Fill between the data points based on activity
-y1 = min(diff_y)
-y2 = max(diff_y)
+# # Create a mask for low, medium, and high activity
+# low_mask = category_y == 1
+# medium_mask = category_y == 2
+# high_mask = category_y == 3
 
-# highlighting the activity by coloring the graph
-ax2.fill_between(timestamps,y1,y2, where=high_mask, color="red", alpha=0.3)
-ax2.fill_between(timestamps,y1,y2, where=medium_mask, color="yellow", alpha=0.3)
-ax2.fill_between(timestamps,y1,y2, where=low_mask, color="green", alpha=0.3)
+# # Fill between the data points based on activity
+# y1 = min(diff_y)
+# y2 = max(diff_y)
 
-ax2.set_title('Changes in y-axis reading over time')
-ax2.set_ylabel('\u0394 Y')
-ax2.xaxis.set_major_locator(mdates.MinuteLocator(interval=60))
-ax2.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M'))
-ax2.tick_params(axis='x', rotation=45)  # Rotate x-axis labels by 90 degrees
+# # highlighting the activity by coloring the graph
+# ax2.fill_between(timestamps,y1,y2, where=high_mask, color="red", alpha=0.3)
+# ax2.fill_between(timestamps,y1,y2, where=medium_mask, color="yellow", alpha=0.3)
+# ax2.fill_between(timestamps,y1,y2, where=low_mask, color="green", alpha=0.3)
 
-# Plot changes in z-axis reading over time
-ax3.plot(forplot_datetime, diff_z, color="b")
+# ax2.set_title('Changes in y-axis reading over time')
+# ax2.set_ylabel('\u0394 Y')
+# ax2.xaxis.set_major_locator(mdates.MinuteLocator(interval=60))
+# ax2.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M'))
+# ax2.tick_params(axis='x', rotation=45)  # Rotate x-axis labels by 90 degrees
 
-# Classify activity for diff_x
-category_z = classify_activity(diff_z, 100, 300)
+# # Plot changes in z-axis reading over time
+# ax3.plot(forplot_datetime, diff_z, color="b")
 
-# Create a mask for low, medium, and high activity
-low_mask = category_z == 1
-medium_mask = category_z == 2
-high_mask = category_z == 3
+# # Classify activity for diff_x
+# category_z = classify_activity(diff_z, 100, 300)
 
-# Fill between the data points based on activity
-y1 = min(diff_y)
-y2 = max(diff_y)
+# # Create a mask for low, medium, and high activity
+# low_mask = category_z == 1
+# medium_mask = category_z == 2
+# high_mask = category_z == 3
 
-# highlighting the activity by coloring the graph
-ax3.fill_between(timestamps,y1,y2, where=high_mask, color="red", alpha=0.3)
-ax3.fill_between(timestamps,y1,y2, where=medium_mask, color="yellow", alpha=0.3)
-ax3.fill_between(timestamps,y1,y2, where=low_mask, color="green", alpha=0.3)
+# # Fill between the data points based on activity
+# y1 = min(diff_y)
+# y2 = max(diff_y)
 
-ax3.set_title('Changes in z-axis reading over time')
-ax3.set_ylabel('\u0394 Z')
-ax3.xaxis.set_major_locator(mdates.MinuteLocator(interval=60))
-ax3.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M'))
-ax3.tick_params(axis='x', rotation=45)  # Rotate x-axis labels by 90 degrees
+# # highlighting the activity by coloring the graph
+# ax3.fill_between(timestamps,y1,y2, where=high_mask, color="red", alpha=0.3)
+# ax3.fill_between(timestamps,y1,y2, where=medium_mask, color="yellow", alpha=0.3)
+# ax3.fill_between(timestamps,y1,y2, where=low_mask, color="green", alpha=0.3)
 
-# # Plot changes in magnitude over time
-# ax4.plot(forplot_datetime, diff_mag)
-# ax4.set_title('Changes in magnitude over time')
-# ax4.set_ylabel('\u0394 Magnitude')
-# ax4.xaxis.set_major_locator(mdates.MinuteLocator(interval=60))
-# ax4.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M'))
-# ax4.tick_params(axis='x', rotation=45)  # Rotate x-axis labels by 90 degrees
+# ax3.set_title('Changes in z-axis reading over time')
+# ax3.set_ylabel('\u0394 Z')
+# ax3.xaxis.set_major_locator(mdates.MinuteLocator(interval=60))
+# ax3.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M'))
+# ax3.tick_params(axis='x', rotation=45)  # Rotate x-axis labels by 90 degrees
 
-# Set the x-axis limits for all subplots (you can customize these limits)
-xmin = datetime(datetimes[0].year, datetimes[0].month, datetimes[0].day, 0, 0)
-xmax = datetime(datetimes[0].year, datetimes[0].month, datetimes[0].day, 23, 59)
-ax1.set_xlim(xmin, xmax)
-ax2.set_xlim(xmin, xmax)
-ax3.set_xlim(xmin, xmax)
-# ax4.set_xlim(xmin, xmax)
+# # # Plot changes in magnitude over time
+# # ax4.plot(forplot_datetime, diff_mag)
+# # ax4.set_title('Changes in magnitude over time')
+# # ax4.set_ylabel('\u0394 Magnitude')
+# # ax4.xaxis.set_major_locator(mdates.MinuteLocator(interval=60))
+# # ax4.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M'))
+# # ax4.tick_params(axis='x', rotation=45)  # Rotate x-axis labels by 90 degrees
 
-plt.tight_layout()
-plt.show()
+# # Set the x-axis limits for all subplots (you can customize these limits)
+# xmin = datetime(datetimes[0].year, datetimes[0].month, datetimes[0].day, 0, 0)
+# xmax = datetime(datetimes[0].year, datetimes[0].month, datetimes[0].day, 23, 59)
+# ax1.set_xlim(xmin, xmax)
+# # ax2.set_xlim(xmin, xmax)
+# # ax3.set_xlim(xmin, xmax)
+# # # ax4.set_xlim(xmin, xmax)
+
+# plt.tight_layout()
+# plt.show()
