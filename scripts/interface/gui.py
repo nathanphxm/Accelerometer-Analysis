@@ -5,7 +5,7 @@ import tkinter as tk
 from tkinter import ttk  # For the Combobox widget
 from tkinter import filedialog
 from tkinter import messagebox
-# from ttkthemes import ThemedTk
+#from ttkthemes import ThemedTk
 import importlib
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from process_data import process_directory
@@ -63,24 +63,36 @@ def load_data():
     global load_data_button, loading_label, accelerometer_data, gps_data
     directory = filedialog.askdirectory()  # Open directory selection dialog
     if directory:
-        #show that data is loading
-        loading_label.config(text="Processing data, please wait...", fg="white")
-        root.update_idletasks()  # Process all pending GUI tasks
-        root.config(cursor="wait")
-        root.update()  # Update the GUI
-        root.update_idletasks()  # Process all pending GUI tasks again
+        try:
+            #show that data is loading
+            loading_label.config(text="Processing data, please wait...", fg="#3F51B5", font=("Open Sans", 14))
+            root.update_idletasks()  # Process all pending GUI tasks
+            if sys.platform != "linux" and sys.platform != "linux2":   
+                root.config(cursor="wait")
+            root.update()  # Update the GUI
+            root.update_idletasks()  # Process all pending GUI tasks again
 
-        accelerometer_data, gps_data = process_directory(directory)
-        print(f"Loaded {len(accelerometer_data)} accelerometer data points.")
+            accelerometer_data, gps_data = process_directory(directory)
+            print(f"Loaded {len(accelerometer_data)} accelerometer data points.")
 
-        #reset loading feedback
-        root.config(cursor="")
-        loading_label.config(text="")
+            #reset loading feedback
+            root.config(cursor="")
+            loading_label.config(text="")
 
-        # If a directory is selected, hide the load_data_button and display the rest of the GUI components
-        load_data_button.pack_forget()
-        loading_label.config(text=f"Current Directory: {directory}")
-        display_gui_components()
+            # If a directory is selected, hide the load_data_button and display the rest of the GUI components
+            load_data_button.pack_forget()
+            loading_label.config(text=f"Current Directory: {directory}")
+            display_gui_components()
+        except Exception as e:
+            # Reset loading feedback
+            root.config(cursor="")
+            loading_label.config(text="")
+            
+            # Show error message
+            messagebox.showerror("Error", f"An error occurred: {str(e)}")
+            
+            # Display the load_data_button again
+            load_data_button.pack(pady=20)
 
 def get_datetime_popup(initial_datetime=None, min_datetime=None, max_datetime=None):
     popup = tk.Toplevel(root)
@@ -199,6 +211,7 @@ def display_gui_components():
     # Create a Combobox
     combobox = ttk.Combobox(ui_frame)
     combobox.pack(side=tk.LEFT, pady=20, padx=20)
+    combobox.set("Choose a graph type")
 
     # Populate Combobox with Python scripts from all subdirectories in the plotting folder
     scripts = []
@@ -210,6 +223,12 @@ def display_gui_components():
 
     combobox['values'] = scripts
 
+    # Clear selection after an item is chosen
+    def clear_selection(event):
+        combobox.selection_clear()
+
+    combobox.bind("<<ComboboxSelected>>", clear_selection)
+
     # Button to display graph
     btn = styled_button(ui_frame, text="Display Graph", command=lambda: display_graph(combobox))
     btn.pack(side=tk.RIGHT, padx=5, pady=10)
@@ -220,79 +239,106 @@ def display_gui_components():
 
 def print_data():
     global accelerometer_data
-    print(accelerometer_data[0])
-    print(accelerometer_data[1])
-    print(accelerometer_data[2])
-     # Check if timestamps are selected
-    if start_datetime is None or end_datetime is None:
-        messagebox.showwarning("Warning", "Please select both start and end timestamps before printing.")
-        return
-        
-    # Prompt the user for a file name/location
-    file_name = filedialog.asksaveasfilename(defaultextension=".csv", filetypes=[("CSV files", "*.csv"), ("All files", "*.*")])
-    if not file_name:
-        return
+    try:
+        print(accelerometer_data[0])
+        print(accelerometer_data[1])
+        print(accelerometer_data[2])
+         # Check if timestamps are selected
+        if start_datetime is None or end_datetime is None:
+            messagebox.showwarning("Warning", "Please select both start and end timestamps before printing.")
+            return
+            
+        # Prompt the user for a file name/location
+        file_name = filedialog.asksaveasfilename(defaultextension=".csv", filetypes=[("CSV files", "*.csv"), ("All files", "*.*")])
+        if not file_name:
+            return
 
-    # Convert the selected start and end datetimes to Unix timestamps
-    start_ts = start_datetime.timestamp()
-    end_ts = end_datetime.timestamp()
+        # Convert the selected start and end datetimes to Unix timestamps
+        start_ts = start_datetime.timestamp()
+        end_ts = end_datetime.timestamp()
 
-    # Filter the accelerometer data based on the selected time range
-    filtered_data = [data for data in accelerometer_data if start_ts <= data[0] <= end_ts]
+        # Filter the accelerometer data based on the selected time range
+        filtered_data = [data for data in accelerometer_data if start_ts <= data[0] <= end_ts]
 
-    # Write the filtered data to the chosen file in CSV format
-    with open(file_name, 'w', newline='') as csvfile:
-        writer = csv.writer(csvfile)
-        writer.writerow(["Timestamp", "Interval", "ACCEL_X", "ACCEL_Y", "ACCEL_Z"])
-        writer.writerows(filtered_data)
+        # Write the filtered data to the chosen file in CSV format
+        with open(file_name, 'w', newline='') as csvfile:
+            writer = csv.writer(csvfile)
+            writer.writerow(["Timestamp", "Interval", "ACCEL_X", "ACCEL_Y", "ACCEL_Z"])
+            writer.writerows(filtered_data)
 
-    print(f"Data saved to {file_name}")
+        print(f"Data saved to {file_name}")
+    except Exception as e:
+        messagebox.showerror("Error", f"An error occurred while printing the data: {e}")
 
 def display_graph(combobox):
     global current_canvas
-    selected_file = combobox.get()
-    if not selected_file:
-        return
-
-    module_path = "scripts.plotting." + selected_file.replace(os.sep, '.').rstrip('.py')
-
-    # Dynamically import the module using the module path
-    plot_module = importlib.import_module(module_path)
-
-    # Convert the selected start and end datetimes to Unix timestamps
-    start_ts = start_datetime.timestamp()
-    end_ts = end_datetime.timestamp()
-
-    # Filter the accelerometer data based on the selected time range
-    filtered_data = [data for data in accelerometer_data if start_ts <= data[0] <= end_ts]
-    fig = plot_module.plot_graph(filtered_data)
-
-    # Remove the old canvas (if it exists)
-    if current_canvas:
-        current_canvas.get_tk_widget().destroy()
+    global start_datetime, end_datetime
+    try:
+        selected_file = combobox.get()
+        print(selected_file)
         
-    # Embed the new figure in the tkinter window
-    canvas = FigureCanvasTkAgg(fig, master=canvas_frame)
-    canvas_widget = canvas.get_tk_widget()
-    canvas_widget.pack(side=tk.TOP, fill=tk.BOTH, expand=1)
-    canvas.draw()
+        if not start_datetime or not end_datetime:
+            messagebox.showerror("Error", "Both start and end times must be selected.")
+            return
+        
+        if not selected_file or selected_file == "Choose a graph type":
+            messagebox.showerror("Error", "No graph type selected.")
+            return
 
-    # Update current_canvas to hold a reference to the current canvas
-    current_canvas = canvas
+        module_path = "scripts.plotting." + selected_file.replace(os.sep, '.').rstrip('.py')
+
+        # Dynamically import the module using the module path
+        plot_module = importlib.import_module(module_path)
+
+        # Convert the selected start and end datetimes to Unix timestamps
+        start_ts = start_datetime.timestamp()
+        end_ts = end_datetime.timestamp()
+
+        # Filter the accelerometer data based on the selected time range
+        filtered_data = [data for data in accelerometer_data if start_ts <= data[0] <= end_ts]
+        fig = plot_module.plot_graph(filtered_data)
+
+        # Remove the old canvas (if it exists)
+        if current_canvas:
+            current_canvas.get_tk_widget().destroy()
+            
+        # Embed the new figure in the tkinter window
+        canvas = FigureCanvasTkAgg(fig, master=canvas_frame)
+        canvas_widget = canvas.get_tk_widget()
+        canvas_widget.pack(side=tk.TOP, fill=tk.BOTH, expand=1)
+        canvas.draw()
+
+        # Update current_canvas to hold a reference to the current canvas
+        current_canvas = canvas
+    except Exception as e:
+        messagebox.showerror("Error", f"An error occurred while displaying the graph: {e}")
+
+def on_close():
+    print("Closing application...")
+    
+    # Destroy the window after cleanup
+    root.destroy()
+    root.quit()
 
 def run_gui():
     global load_data_button, loading_label
     global canvas_frame, ui_frame
     global root
     root = tk.Tk()
-    # root = ThemedTk(theme="arc")
-
-        # Frame for top buttons
+    #root = ThemedTk(theme="arc")
+    style = ttk.Style()
+    
+    # Modify the Combobox using style.map and style.configure
+    # Setting internal padding, font color, relief, and border color
+    style.configure('TCombobox', padding=(4, 4), foreground='#3F51B5', relief='flat', bordercolor='#3F51B5')
+    
+    # Frame for top buttons
     ui_frame = tk.Frame(root)
     ui_frame.pack(side=tk.TOP, fill=tk.X)
     ui_frame.config(bg="#E0E0E0")
 
     root.config(bg='#E0E0E0')
+    root.protocol("WM_DELETE_WINDOW", on_close)
 
     # Maximizing the window based on the platform
     if sys.platform == "win32":
