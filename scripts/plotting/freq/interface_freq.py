@@ -58,7 +58,7 @@ def plot_graph(data):
 
     # Create a line plot for frequency
     fig = plt.figure(figsize=(12, 6), facecolor='white')
-    plt.plot(time, frequency, marker= None, color='blue', label='Frequency')
+    plt.plot(time, frequency, marker= None, color='black', label='Frequency')
 
     plt.xlabel('Time (GMT+8)')
     plt.ylabel('Frequency of Movement')
