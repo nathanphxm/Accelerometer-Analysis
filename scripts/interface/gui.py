@@ -5,7 +5,7 @@ import tkinter as tk
 from tkinter import ttk  # For the Combobox widget
 from tkinter import filedialog
 from tkinter import messagebox
-# from ttkthemes import ThemedTk
+#from ttkthemes import ThemedTk
 import importlib
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from process_data import process_directory
@@ -223,6 +223,12 @@ def display_gui_components():
 
     combobox['values'] = scripts
 
+    # Clear selection after an item is chosen
+    def clear_selection(event):
+        combobox.selection_clear()
+
+    combobox.bind("<<ComboboxSelected>>", clear_selection)
+
     # Button to display graph
     btn = styled_button(ui_frame, text="Display Graph", command=lambda: display_graph(combobox))
     btn.pack(side=tk.RIGHT, padx=5, pady=10)
@@ -319,9 +325,14 @@ def run_gui():
     global canvas_frame, ui_frame
     global root
     root = tk.Tk()
-    # root = ThemedTk(theme="arc")
-
-        # Frame for top buttons
+    #root = ThemedTk(theme="arc")
+    style = ttk.Style()
+    
+    # Modify the Combobox using style.map and style.configure
+    # Setting internal padding, font color, relief, and border color
+    style.configure('TCombobox', padding=(4, 4), foreground='#3F51B5', relief='flat', bordercolor='#3F51B5')
+    
+    # Frame for top buttons
     ui_frame = tk.Frame(root)
     ui_frame.pack(side=tk.TOP, fill=tk.X)
     ui_frame.config(bg="#E0E0E0")
