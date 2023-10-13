@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 from datetime import datetime
 
-# Base threshold for activity classification,
+# Base threshold for activity classification
 LOW_THRESHOLD = 300
 MEDIUM_THRESHOLD = 600
 
@@ -69,7 +69,7 @@ def plot_graph(data):
             plt.Rectangle((0, 0), 1, 1, color="#1A85FF"),
             plt.Rectangle((0, 0), 1, 1, color="#DC3220")]
 
-    ax1.legend(handles, ["Moderate Activity", "High Activity"], loc = 'upper left')
+    ax1.legend(handles, ["Moderate Activity", "High Activity"], bbox_to_anchor=(1.04, 1), loc="upper left")
 
     plt.tight_layout()
     return fig

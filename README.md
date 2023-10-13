@@ -170,3 +170,19 @@ Similar to above, you can drag in a folder or an individual file into the prompt
 
 ![Drag a folder worth of data into the prompt](https://github.com/nathanphxm/Accelerometer-Analysis/blob/f5564f394473758a5b7e6434a34b5d2e19121c6d/docs/drag-for-path-2.gif)
 
+
+## Graphical Analysis
+#### Fast Fourier Transform graph
+Runtime: around 10 seconds for 24 hour data
+
+The following figure shows the Fast Fourier Transform graph on the X axis, Y axis, and Z axis data. The FFT plots give a rough idea of the frequency content in the signal. 
+
+In the plot, the x-axis shows varying frequency in hertz and y-axis shows the amplitude of the given frequency in the data. Since the data is a time series data, the FFT plot does not give too much information on identifying pattern throughout the time of the day, and is useful just for preliminary analysis of the data to figure out distribution of frequencies intensity in a given timeframe.
+
+![Drag a folder worth of data into the prompt](https://github.com/nathanphxm/Accelerometer-Analysis/blob/f5564f394473758a5b7e6434a34b5d2e19121c6d/docs/FFT plot.png)
+
+
+#### Acceleration Difference graph
+Runtime: around 1 minute for 24 hour data
+
+The following figure shows an acceleration difference graph for the X axis, Y axis, and Z axis data. Given the accelerometer data xi = x1, x2, .., xn. where n = length of file. The difference of x[i+1] and x[i] is calculated and plotted against the timestamps. Through this plot, a time series analysis can be observed and patterns on data can be inferred.
