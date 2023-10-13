@@ -211,6 +211,7 @@ def display_gui_components():
     # Create a Combobox
     combobox = ttk.Combobox(ui_frame)
     combobox.pack(side=tk.LEFT, pady=20, padx=20)
+    combobox.set("Choose a graph type")
 
     # Populate Combobox with Python scripts from all subdirectories in the plotting folder
     scripts = []
@@ -268,12 +269,13 @@ def display_graph(combobox):
     global start_datetime, end_datetime
     try:
         selected_file = combobox.get()
+        print(selected_file)
         
         if not start_datetime or not end_datetime:
             messagebox.showerror("Error", "Both start and end times must be selected.")
             return
         
-        if not selected_file:
+        if not selected_file or selected_file == "Choose a graph type":
             messagebox.showerror("Error", "No graph type selected.")
             return
 
