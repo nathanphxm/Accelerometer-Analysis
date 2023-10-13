@@ -305,6 +305,12 @@ def display_graph(combobox):
     except Exception as e:
         messagebox.showerror("Error", f"An error occurred while displaying the graph: {e}")
 
+def on_close():
+    print("Closing application...")
+    
+    # Destroy the window after cleanup
+    root.quit()
+
 def run_gui():
     global load_data_button, loading_label
     global canvas_frame, ui_frame
@@ -318,6 +324,7 @@ def run_gui():
     ui_frame.config(bg="#E0E0E0")
 
     root.config(bg='#E0E0E0')
+    root.protocol("WM_DELETE_WINDOW", on_close)
 
     # Maximizing the window based on the platform
     if sys.platform == "win32":
