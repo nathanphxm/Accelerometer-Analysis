@@ -71,6 +71,11 @@ If `pip` is not installed:
 $ sudo apt-get update && sudo apt-get upgrade -y
 $ sudo apt-get install python3-pip -y
 ```
+**2. Ensure next that `git` is installed on the machine.**
+```bash
+$ git --version
+$ 
+```
 
 ### Windows
 In Terminal, or your favourite terminal emulator (Command Prompt may work!):
