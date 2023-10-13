@@ -265,9 +265,16 @@ def print_data():
 
 def display_graph(combobox):
     global current_canvas
+    global start_datetime, end_datetime
     try:
         selected_file = combobox.get()
+        
+        if not start_datetime or not end_datetime:
+            messagebox.showerror("Error", "Both start and end times must be selected.")
+            return
+        
         if not selected_file:
+            messagebox.showerror("Error", "No graph type selected.")
             return
 
         module_path = "scripts.plotting." + selected_file.replace(os.sep, '.').rstrip('.py')
