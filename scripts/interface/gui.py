@@ -309,6 +309,7 @@ def on_close():
     print("Closing application...")
     
     # Destroy the window after cleanup
+    root.destroy()
     root.quit()
 
 def run_gui():
