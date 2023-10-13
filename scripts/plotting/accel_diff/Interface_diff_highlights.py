@@ -69,7 +69,8 @@ def plot_graph(data):
             plt.Rectangle((0, 0), 1, 1, color="#1A85FF"),
             plt.Rectangle((0, 0), 1, 1, color="#DC3220")]
 
-    ax1.legend(handles, ["Moderate Activity", "High Activity"], bbox_to_anchor=(1.04, 1), loc="upper left")
+    ax3.legend(handles, ["Moderate Activity", "High Activity"], loc='upper center', bbox_to_anchor=(0.5, -0.5),
+          fancybox=True, shadow=True, ncol=2)
 
     plt.tight_layout()
     return fig
