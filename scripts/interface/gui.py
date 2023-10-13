@@ -65,7 +65,7 @@ def load_data():
     if directory:
         try:
             #show that data is loading
-            loading_label.config(text="Processing data, please wait...", fg="white")
+            loading_label.config(text="Processing data, please wait...", fg="#3F51B5", font=("Open Sans", 14))
             root.update_idletasks()  # Process all pending GUI tasks
             if sys.platform != "linux" and sys.platform != "linux2":   
                 root.config(cursor="wait")
