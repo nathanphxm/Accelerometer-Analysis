@@ -87,7 +87,7 @@ def plot_graph(data):
 
     # Create a line plot for cumulative frequency
     fig = plt.figure(figsize=(12, 6), facecolor='white')
-    plt.plot(time, frequency, marker=None, color='blue', label='Cumulative Frequency')
+    plt.plot(time, frequency, marker=None, color='black', label='Cumulative Frequency')
 
     # Create a list to store the rows for the CSV
     csv_rows = [['Datetime', 'Frequency per Minute', 'Activity Level']]

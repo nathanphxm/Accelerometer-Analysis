@@ -148,6 +148,11 @@ Do you want to use the GUI or CLI? (gui/cli):
 Choose an option by typing it in the prompt. 
 
 #### Using the graphical user interface:
+1. Click "Load Data" and select the folder containing data you want to be analysed and visualised.
+2. Click "Set Start Date & Time" and "Set End Date & Time" to select the timeframe and click "OK".
+3. From the drop-down list, select the code respective to the graph you want to see.
+4. Click "Print Data" to get the cleaned csv file.
+5. Click "Display Graph" to show graph.
 
 #### Using the command-line interface:
 
@@ -171,6 +176,48 @@ Similar to above, you can drag in a folder or an individual file into the prompt
 ![Drag a folder worth of data into the prompt](https://github.com/nathanphxm/Accelerometer-Analysis/blob/f5564f394473758a5b7e6434a34b5d2e19121c6d/docs/drag-for-path-2.gif)
 
 
+
+## Data visualisation
+
+### Activity level based on frequency of movement (interface_activity_freq.py)
+[Approx running time: less than 10 seconds, if it takes longer than this, it might be an error in data file.] 
+
+Sample graph: Activity level on cumulative frequency graph (24 hours) 
+
+This graph show you the activity level (low, moderate, high) of sheep based on its frequency of movement per minute, in addition to a line showing its cumulative frequency for reference.
+
+Running this code in GUI will also output a "output.csv" file containing 'Datetime', 'Frequency per Minute', 'Activity Level' for the period selected to your directory folder.
+
+![Sample output for 24 hours](./sample_demo_gui/Activity%20level%20on%20cumulative%20frequency%20graph%20(24%20hours).jpeg)
+
+Threshold values are adjustable in the python code (line 15, 16) to determine the categorisation of activity level.
+
+Frequency threshold value is adjustable in the python code (line 19) to determine how large the difference between x(t),y(t),z(t) and x(t+1),y(t+1),z(t+1) is needed to detect a movement calculating into frequency. Frequecny will be added into that minute if either of the axes has a difference of the threshold value you set (e.g. in the sample case, is a difference of 10).
+
+![Adjustable threshold in python code](./sample_demo_gui/Activity%20Freq%20code.png)
+
+By adjusting the timeframe in GUI, you can select certain hour to visualise the data (e.g. in this case is 4 hours).
+
+Sample graph: Activity level on cumulative frequency graph (4 hours) 
+![Sample output for 4 hours](./sample_demo_gui/Activity%20level%20on%20cumulative%20frequency%20graph%20(4%20hours).jpeg)
+
+### Frequency of movement per minute (interface_freq.py)
+[Approx running time: less than 5 seconds, if it takes longer than this, it might be an error in data file.]
+
+Sample graph: Frequency per minute graph (24 hours) 
+
+This graph show you the total activity of the sheep per minute (frequency of movement), based on the difference between each movement at timestamp(0) and timestamp(1).
+
+![Sample output for 24 hours](./sample_demo_gui/Frequency%20per%20minute%20(24%20hours).png)
+
+Frequency threshold value is adjustable in the python code (line 12) to determine how large the difference between x(t),y(t),z(t) and x(t+1),y(t+1),z(t+1) is needed to detect a movement calculating into frequency. Frequecny will be added into that minute if either of the axes has a difference of the threshold value you set (e.g. in the sample case, is a difference of 10).
+
+![Adjustable threshold in python code](./sample_demo_gui/Freq%20code.png)
+
+By adjusting the timeframe in GUI, you can select certain hour to visualise the data (e.g. in this case is 4 hours).
+
+Sample graph: Frequency per minute graph (4 hours) 
+![Sample output for 4 hours](./sample_demo_gui/Frequency%20per%20minute%20(4%20hours).png)
 ## Graphical Analysis
 #### Fast Fourier Transform graph
 Runtime: around 10 seconds for 24 hour data
