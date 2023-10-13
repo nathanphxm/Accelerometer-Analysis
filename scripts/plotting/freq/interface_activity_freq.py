@@ -1,8 +1,9 @@
-### required by client
-
-# The main function for this code is to highlight different activity level (low, moderate, high) on the cumulative frequency graph.
-# Two threshold values are adjustable to determine the categorisation of activity level.
-# Month and day can be selected to adjust the intended timeframe.
+'''
+The main function for this code is to highlight different activity level (low, moderate, high) on the cumulative frequency graph.
+Two threshold values are adjustable to determine the categorisation of activity level.
+Frequency threshold value is adjustable to determine how large the difference between x(t),y(t),z(t) and x(t+1),y(t+1),z(t+1) is needed to detect a movement calculating into frequency.
+A "output.csv" file will be generated when you run this code in GUI, showing 'Datetime', 'Frequency per Minute', 'Activity Level' for the period selected.
+'''
 
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
