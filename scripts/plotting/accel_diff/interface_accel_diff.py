@@ -1,16 +1,12 @@
 '''
-A script to plot delta acceleration of each axis, as well as highlighting the activity level in 3 categories: low, medium, high
-By changing upper and lower threshold, the intensity of activity highlights can be adjusted.
+A script to plot delta acceleration of each axis, without the highlighting.
+The structure of the code follows: file reading -> calculation of diff -> plotting 
 '''
 
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 from datetime import datetime
-
-# Base threshold for activity classification,
-LOW_THRESHOLD = 300
-MEDIUM_THRESHOLD = 600
 
 def plot_graph(data):
     #data reading
@@ -32,12 +28,6 @@ def plot_graph(data):
     #function to plot the subplots, for modularisation of code
     def plot_subplot(ax, diff):
         ax.plot(timestamps, diff, color="black")
-        y1, y2 = min(diff), max(diff)
-
-        #highlighting of graph, red = low activity, yellow = medium activity, green = high activity
-        #ax.fill_between(timestamps,y1,y2,where = diff < LOW_THRESHOLD, color = "#F5EEE0", alpha = 0.5)
-        ax.fill_between(timestamps, y1, y2, where=(diff < MEDIUM_THRESHOLD) & (diff > LOW_THRESHOLD), color="#1A85FF", alpha=0.3)
-        ax.fill_between(timestamps,y1,y2,where = diff >= MEDIUM_THRESHOLD,color = "#DC3220", alpha = 0.3)
 
         ax.set_xlim(min(timestamps), max(timestamps))
         ax.xaxis.set_major_locator(mdates.MinuteLocator(interval=60))
@@ -64,12 +54,6 @@ def plot_graph(data):
     )
     ax3.set_title('Changes in z-axis reading over time')
     ax3.set_ylabel('\u0394 Z')
-
-    handles = [
-            plt.Rectangle((0, 0), 1, 1, color="#1A85FF"),
-            plt.Rectangle((0, 0), 1, 1, color="#DC3220")]
-
-    ax1.legend(handles, ["Moderate Activity", "High Activity"], loc = 'upper left')
 
     plt.tight_layout()
     return fig
