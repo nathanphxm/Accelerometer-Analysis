@@ -1,4 +1,4 @@
-### required by client
+### required by client (gui activity freq v1)
 
 # The main function for this code is to highlight different activity level (low, moderate, high) on the cumulative frequency graph.
 # Two threshold values are adjustable to determine the categorisation of activity level.
