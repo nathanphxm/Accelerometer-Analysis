@@ -210,7 +210,7 @@ This graph show you the total activity of the sheep per minute (frequency of mov
 
 ![Sample output for 24 hours](./sample_demo_gui/Frequency%20per%20minute%20(24%20hours).png)
 
-Frequency threshold value is adjustable in the python code (line 12) to determine how large the difference between x(t),y(t),z(t) and x(t+1),y(t+1),z(t+1) is needed to detect a movement calculating into frequency. Frequecny will be added into that minute if either of the axes has a difference of the threshold value you set (e.g. in the sample case, is a difference of 10).
+Frequency threshold value is adjustable in the python code (line 12) to determine how large the difference between x(t),y(t),z(t) and x(t+1),y(t+1),z(t+1) is needed to detect a movement calculating into frequency. Frequency will be added into that minute if either of the axes has a difference of the threshold value you set (e.g. in the sample case, is a difference of 10).
 
 ![Adjustable threshold in python code](./sample_demo_gui/Freq%20code.png)
 
@@ -218,3 +218,33 @@ By adjusting the timeframe in GUI, you can select certain hour to visualise the 
 
 Sample graph: Frequency per minute graph (4 hours) 
 ![Sample output for 4 hours](./sample_demo_gui/Frequency%20per%20minute%20(4%20hours).png)
+
+#### Fast Fourier Transform graph (Interface_fft.py)
+Runtime: around 10 seconds for 24 hour data
+
+The following figure shows the Fast Fourier Transform graph on the X axis, Y axis, and Z axis data. The FFT plots give a rough idea of the frequency content in the signal. 
+
+In the plot, the x-axis shows varying frequency measured in hertz and y-axis shows the amplitude of the given frequency in the data. Since the data is a time series data, the FFT plot does not give too much information on identifying pattern throughout the time of the day, and is useful just for preliminary analysis of the data to figure out distribution of frequencies intensity in a given timeframe.
+
+![FFT plot output for 24 hours data](https://github.com/nathanphxm/Accelerometer-Analysis/blob/f5564f394473758a5b7e6434a34b5d2e19121c6d/docs/FFT plot.png)
+
+
+
+
+#### Acceleration Difference per sample point(Interface_diff)
+Runtime: around 20 second for 24 hour data
+
+The following figure shows an acceleration difference graph for the X axis, Y axis, and Z axis data. Given the accelerometer data xi = x1, x2, .., xn. where n = length of file. The difference of x[i+1] and x[i] is calculated and plotted against the timestamps. The main aim of this plot is to reduce noise from the data, and get a better clarity on the visuals of the data points. Through this plot, a time series analysis can be observed and patterns on data can be inferred.
+
+![accel difference plot output for 24 hours data](https://github.com/nathanphxm/Accelerometer-Analysis/blob/f5564f394473758a5b7e6434a34b5d2e19121c6d/docs/Acceleration Difference.png)
+
+#### Activity highlighting through difference of acceleratioon (Interface_diff_highlights.py)
+Runtime: around 1 minute for 24 hour data
+
+Following on the acceleration difference plot, depending on the values of the difference per data point, the rows are categorised into 3 levels: "high activity", "medium activity", and "low activity". The aim of this graph is to give a clear visualisation on how intense the activities of the sheep are throughout the day. In the actual graph, there are sections colored in blue for medium activity and red for high activity. The low activity are not colored, as this over populated the graph with colors, possibly obstructing the interests of the analysis, which is finding the important times when sheep activity peaks. The graph below shows the actual plot of the highlighted graph.
+
+![highlighted acceleration difference plot output for 24 hours data](https://github.com/nathanphxm/Accelerometer-Analysis/blob/f5564f394473758a5b7e6434a34b5d2e19121c6d/docs/Acceleration Difference Highlighted.png)
+
+The threshold of values used for the highlighting can be adjusted in the python scripts by changing the value of the global variable LOW_THRESHOLD and MEDIUM_THRESHOLD in line 12.
+
+![changing threshold value](https://github.com/nathanphxm/Accelerometer-Analysis/blob/f5564f394473758a5b7e6434a34b5d2e19121c6d/docs/Changing Threshold.png)

@@ -1,3 +1,7 @@
+'''
+Mathematical calculation for the pitch and roll angle for the accelerometer
+source: https://www.analog.com/en/app-notes/an-1057.html
+'''
 import numpy as np
 import math
 import matplotlib.pyplot as plt
