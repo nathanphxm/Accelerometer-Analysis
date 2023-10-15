@@ -6,7 +6,7 @@ from process_data import process_file
 
 def load_data_dir(dir):
     print("Analysing directory: " + dir)
-    accelerometer_data, gps_data = process_directory(dir)
+    accelerometer_data, gps_data = process_directory(dir.rstrip())
     choice = input("[P]rint data to console, [E]xport data to CSV, [R]eturn to menu or e[X]it? ").lower()
 
     if choice == "p":
@@ -17,7 +17,7 @@ def load_data_dir(dir):
         if print_type == "g":
             print(gps_data)
         if print_type == "b":
-            print(accelerometer_data)
+            print(accelerometer_data, gps_data)
     if choice == "e":
         base_filename = dir.split("/")[-1]
         export_type = input("[A]ccelerometer data only or [G]PS data only? ").lower()
