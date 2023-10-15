@@ -5,8 +5,8 @@ from process_data import process_directory
 from process_data import process_file
 
 def load_data_dir(dir):
-    dir = dir.strip(' ')
-    print("Analysing directory: " + dir)
+    # strip whitespace from end of directory name
+    dir = dir.replace('\\', '').rstrip()
     accelerometer_data, gps_data = process_directory(dir)
     choice = input("[P]rint data to console, [E]xport data to CSV, [R]eturn to menu or e[X]it? ").lower()
 
