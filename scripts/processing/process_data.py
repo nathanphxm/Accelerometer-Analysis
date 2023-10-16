@@ -1,75 +1,36 @@
-import re
-import datetime
 import os
-
-def process_file(filename):
-    timestamp_diff, lines = get_timestamp_diff_and_lines(filename)
-
-    accelerometer_data = []
-    gps_data = []
-
-    current_timestamp = 0
-    count = 1
-    for line in lines:
-        line = line.strip()
-        values = line.split(',')
-        
-        match = re.match(r'\*(\d+)', line)
-        if match:
-            current_timestamp = int(match.group(1)) + timestamp_diff
-            count = 1
-            continue
-
-        if len(values) == 11:
-            gps_data.append(values[3:11])
-            continue
-
-        if len(values) == 3 and values != ['0', '0', '0']:
-            output = [current_timestamp, count] + values
-            accelerometer_data.append(output)
-        
-        count += 1
-
-    return accelerometer_data, gps_data
-
-
-def get_timestamp_diff_and_lines(filename):
-    calculated_timestamp = 0
-    given_timestamp = 0
-    lines = []
-    
-    with open(filename, 'r') as file:
-        lines = file.readlines()
-        for line in lines:
-            line = line.strip()
-            values = line.split(',')
-            
-            match = re.match(r'\*(\d+)', line)
-            if match:
-                given_timestamp = int(match.group(1))
-
-            if len(values) == 11:
-                dt = datetime.datetime(int(values[7]), int(values[6]), int(values[5]), int(values[8]), int(values[9]), int(values[10]), tzinfo=datetime.timezone.utc)
-                calculated_timestamp = int(dt.timestamp())
-                break  
-
-    return calculated_timestamp - given_timestamp, lines
+import re
 
 def process_directory(directory):
+    # Regex pattern for filenames
+    pattern = re.compile(r'^file[0-9]{3}\.txt$')
+    
+    # The header line
+    header = "ACCEL_X,ACCEL_Y,ACCEL_Z,LAT,LON,DAY,MONTH,YEAR,HOUR,MINUTE,SECOND\n"
+    
+    accel_data = []
+    gps_data = []
+    current_timestamp = None
+    
     # List all files in the directory
-    files = os.listdir(directory)
-
-    # Filter out files that match the pattern
-    pattern = re.compile(r'file\d{3}\.txt')
-    matching_files = [f for f in files if pattern.match(f)]
-
-    # Process each file and concatenate the data
-    all_accelerometer_data = []
-    all_gps_data = []
-    for filename in matching_files:
-        filepath = os.path.join(directory, filename)
-        accelerometer_data, gps_data = process_file(filepath)
-        all_accelerometer_data.extend(accelerometer_data)
-        all_gps_data.extend(gps_data)
-
-    return all_accelerometer_data, all_gps_data
+    for filename in sorted(os.listdir(directory)):
+        if pattern.match(filename):  # if the filename matches the desired format
+            with open(os.path.join(directory, filename), 'r') as f:
+                for line in f:
+                    if line == header:
+                        current_timestamp = None
+                        continue
+                    
+                    split_data = line.strip().split(',')
+                    if line.startswith("*"):
+                        current_timestamp = split_data[0].replace('*', '') 
+                        continue
+                    elif len(split_data) == 3:
+                        accel_data.append([current_timestamp] + split_data)
+                    elif len(split_data) == 11:
+                        gps_data.append([current_timestamp] + split_data)
+    
+    print(accel_data[0])
+    print(gps_data[0])
+    
+    return accel_data, gps_data
