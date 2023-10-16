@@ -1,75 +1,75 @@
-import re
-import datetime
 import os
+import re
+from datetime import datetime, timedelta
 
-def process_file(filename):
-    timestamp_diff, lines = get_timestamp_diff_and_lines(filename)
-
-    accelerometer_data = []
-    gps_data = []
-
-    current_timestamp = 0
-    count = 1
-    for line in lines:
-        line = line.strip()
-        values = line.split(',')
-        
-        match = re.match(r'\*(\d+)', line)
-        if match:
-            current_timestamp = int(match.group(1)) + timestamp_diff
-            count = 1
-            continue
-
-        if len(values) == 11:
-            gps_data.append(values[3:11])
-            continue
-
-        if len(values) == 3 and values != ['0', '0', '0']:
-            output = [current_timestamp, count] + values
-            accelerometer_data.append(output)
-        
-        count += 1
-
-    return accelerometer_data, gps_data
-
-
-def get_timestamp_diff_and_lines(filename):
-    calculated_timestamp = 0
-    given_timestamp = 0
-    lines = []
-    
-    with open(filename, 'r') as file:
-        lines = file.readlines()
-        for line in lines:
-            line = line.strip()
-            values = line.split(',')
-            
-            match = re.match(r'\*(\d+)', line)
-            if match:
-                given_timestamp = int(match.group(1))
-
-            if len(values) == 11:
-                dt = datetime.datetime(int(values[7]), int(values[6]), int(values[5]), int(values[8]), int(values[9]), int(values[10]), tzinfo=datetime.timezone.utc)
-                calculated_timestamp = int(dt.timestamp())
-                break  
-
-    return calculated_timestamp - given_timestamp, lines
+def gps_to_unix(gps_entry):
+    """Converts GPS data entry to a UNIX timestamp."""
+    timestamp, _, _, _, lat, lon, day, month, year, hour, minute, second = gps_entry
+    dt = datetime(int(year), int(month), int(day), int(hour), int(minute), int(second))
+    unix_timestamp = int(dt.timestamp())
+    return unix_timestamp
 
 def process_directory(directory):
+    # Regex pattern for filenames
+    pattern = re.compile(r'^file[0-9]{3}\.txt$')
+    
+    # The header line
+    header = "ACCEL_X,ACCEL_Y,ACCEL_Z,LAT,LON,DAY,MONTH,YEAR,HOUR,MINUTE,SECOND\n"
+    
+    accel_data = []
+    gps_data = []
+    current_timestamp = None
+    
     # List all files in the directory
-    files = os.listdir(directory)
+    for filename in sorted(os.listdir(directory)):
+        if pattern.match(filename):  # if the filename matches the desired format
+            with open(os.path.join(directory, filename), 'r') as f:
+                for line in f:
+                    if line == header:
+                        current_timestamp = None
+                        continue
+                                
+                    split_data = line.strip().split(',')
+                    if line.startswith("*"):
+                        current_timestamp = int(split_data[0].replace('*', ''))
+                        continue
+                    elif current_timestamp is not None:
+                        if len(split_data) == 3:
+                            accel_data.append([current_timestamp] + [int(val) for val in split_data])
+                        elif len(split_data) == 11:
+                            gps_data.append([current_timestamp] + split_data)
+        
+    # Determine the UNIX timestamp and the original timestamp for the first GPS entry
+    first_unix_timestamp = gps_to_unix(gps_data[0])
+    first_original_timestamp = int(gps_data[0][0])
 
-    # Filter out files that match the pattern
-    pattern = re.compile(r'file\d{3}\.txt')
-    matching_files = [f for f in files if pattern.match(f)]
+    # Calculate the base UNIX timestamp for the accelerometer data
+    base_unix_timestamp = first_unix_timestamp - first_original_timestamp
 
-    # Process each file and concatenate the data
-    all_accelerometer_data = []
-    all_gps_data = []
-    for filename in matching_files:
-        filepath = os.path.join(directory, filename)
-        accelerometer_data, gps_data = process_file(filepath)
-        all_accelerometer_data.extend(accelerometer_data)
-        all_gps_data.extend(gps_data)
+    # Convert accelerometer timestamps
+    previous_timestamp = None
+    interval_counter = 1
+    for i, entry in enumerate(accel_data):
+        original_timestamp = int(entry[0])
+        new_unix_timestamp = base_unix_timestamp + original_timestamp
 
-    return all_accelerometer_data, all_gps_data
+        # Check if current timestamp is same as previous, if not reset counter
+        if previous_timestamp != new_unix_timestamp:
+            interval_counter = 1
+        else:
+            interval_counter += 1
+
+        accel_data[i] = [new_unix_timestamp, interval_counter] + entry[1:]
+
+        # Update previous timestamp to current timestamp
+        previous_timestamp = new_unix_timestamp
+
+    # Replace timestamps in gps_data
+    for i, entry in enumerate(gps_data):
+        gps_data[i][0] = base_unix_timestamp + int(entry[0])
+
+    print(accel_data[0])
+    print(accel_data[1])
+
+    print(accel_data[2])
+    return accel_data, gps_data
