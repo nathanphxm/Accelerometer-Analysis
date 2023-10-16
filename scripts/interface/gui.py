@@ -24,6 +24,7 @@ accelerometer_data = []
 gps_data = []
 data_from_graph = []
 GMT8 = timezone(timedelta(hours=8))
+DATE_FORMAT = None
 
 def styled_button(master, **kwargs):
     BUTTON_COLOR = "#3F51B5"
@@ -110,7 +111,7 @@ def get_datetime_popup(initial_datetime=None, min_datetime=None, max_datetime=No
     minute_scale.pack(pady=10, padx=10, fill=tk.X)
 
     def on_date_selected(event):
-        selected_date = datetime.strptime(calendar.get_date(), '%m/%d/%y').date()
+        selected_date = datetime.strptime(calendar.get_date(), DATE_FORMAT).date()
         
         # Reset scales to full range
         hour_scale.config(from_=0, to=23)
@@ -142,7 +143,7 @@ def get_datetime_popup(initial_datetime=None, min_datetime=None, max_datetime=No
     calendar.bind("<<CalendarSelected>>", on_date_selected)
 
     def on_hour_changed(event=None):
-        selected_date = datetime.strptime(calendar.get_date(), '%m/%d/%y').date()
+        selected_date = datetime.strptime(calendar.get_date(), DATE_FORMAT).date()
         # Reset minute scale to full range initially
         minute_scale.config(from_=0, to=59)
         
@@ -157,7 +158,7 @@ def get_datetime_popup(initial_datetime=None, min_datetime=None, max_datetime=No
 
     def on_ok():
         selected_date_str = calendar.get_date()
-        selected_date = datetime.strptime(selected_date_str, '%m/%d/%y').date()
+        selected_date = datetime.strptime(selected_date_str, DATE_FORMAT).date()
         selected_time = time(hour=hour_scale.get(), minute=minute_scale.get())
         selected_datetime = datetime.combine(selected_date, selected_time)
         popup.selected_datetime = selected_datetime
@@ -324,6 +325,7 @@ def run_gui():
     global load_data_button, loading_label
     global canvas_frame, ui_frame
     global root
+    global DATE_FORMAT
     root = tk.Tk()
     #root = ThemedTk(theme="arc")
     style = ttk.Style()
@@ -341,11 +343,14 @@ def run_gui():
     root.protocol("WM_DELETE_WINDOW", on_close)
 
     # Maximizing the window based on the platform
-    if sys.platform == "win32":
+    if sys.platform == "win32": 
         root.state('zoomed')
+        DATE_FORMAT = '%m/%d/%y'
     elif sys.platform == "linux" or sys.platform == "linux2":
         root.attributes('-zoomed', True)
+        DATE_FORMAT = '%m/%d/%y'
     elif sys.platform == "darwin":
+        DATE_FORMAT = '%d/%m/%y'
         w, h = root.winfo_screenwidth() * 0.8, root.winfo_screenheight() * 0.8
         x, y = (root.winfo_screenwidth() - w) // 2, (root.winfo_screenheight() - h) // 2
         root.geometry(f"{int(w)}x{int(h)}+{int(x)}+{int(y)}")
