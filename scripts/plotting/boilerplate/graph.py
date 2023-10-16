@@ -2,7 +2,8 @@ import matplotlib.pyplot as plt
 
 def plot_graph(data):
     """
-    Plot the accelerometer data.
+    THIS IS A SAMPLE FILE DESIGNED TO DEMONSTRATE STRUCTURE ONLY. 
+    THIS GRAPH DOES NOT EXECUTE - PLEASE ONLY USE AS A SAMPLE.
     
     Parameters:
     - data: List of lists/tuples containing accelerometer data of the form:
