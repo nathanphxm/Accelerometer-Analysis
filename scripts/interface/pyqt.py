@@ -2,6 +2,7 @@ import sys
 import os
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", "processing"))
 import importlib
+import csv
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QPushButton, QVBoxLayout, 
                              QWidget, QFileDialog, QLabel, QComboBox, QHBoxLayout, QSpacerItem, QSizePolicy)
 from PyQt5.QtCore import Qt, QDateTime, QTime
@@ -338,8 +339,22 @@ class AppWindow(QMainWindow):
 
     def print_data(self):
         if hasattr(self, 'accel_data') and self.accel_data is not None:
-            print(self.accel_data[0])
-            print(self.accel_data[-1])
+            # Open a file dialog for the user to select the save location
+            data_to_write = self.get_filtered_data()
+            options = QFileDialog.Options()
+            fileName, _ = QFileDialog.getSaveFileName(self, "Save CSV File", "", "CSV Files (*.csv);;All Files (*)", options=options)
+            if fileName:
+                # Check if the file has the correct extension
+                if not fileName.endswith('.csv'):
+                    fileName += '.csv'
+                
+                # Use the csv.writer to write the header and data
+                with open(fileName, mode='w', newline='') as file:
+                    writer = csv.writer(file)
+                    writer.writerow(["TIMESTAMP", "INTERVAL", "X_ACCEL", "Y_ACCEL", "Z_ACCEL"])
+                    writer.writerows(data_to_write)
+
+                QMessageBox.information(self, "Info", "Data exported successfully!")
         else:
             print("No data loaded.")
 
