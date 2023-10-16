@@ -4,17 +4,39 @@ Created for CITS3200 2023 Semester 2 with love from Group 6.
 
 ## Installing prerequisites
 
-- Windows (tested on 10? 11?), macOS (tested on 13.x Ventura and 14.x Sonoma), Linux (tested on Ubuntu xx.xx.x)
-- Python 3 (tested on 3.9.x, 3.11.x, TBA)
+- Windows (tested on 11), macOS (tested on 13.x Ventura and 14.x Sonoma), Linux (tested on Ubuntu 22.04.x)
+- Python 3 (tested on 3.11.x)
 - tkinter (for graphical interfaces)
 - matplotlib (for graphing)
 
 *Specific versions of software are not required unless specified; anything noted with an **x** can be treated as any number.*
 
+For clarity, all terminal commands/outputs will be displayed in this format:
+
+```bash
+$ command1                  # everything after the $ can be copied safely
+$ command2                  # execute AFTER previous command has successfully completed                  
+output                      # expected output of above command(s)
+```
+
 ### macOS
+
+**IMPORTANT PREREQUISITE ON macOS:**
+
+**Install homebrew package manager - it will solve MANY issues regarding packages and versions and incompatibilities.**
+
+From https://brew.sh/
+
+```/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"```
+
+This will install the Homebrew package manager. Please follow its prompts!
+
+---
+
 **1. Ensure that Python 3.x is installed on the machine.**
 In Terminal, or your favourite terminal emulator:
 ```bash
+$ brew install python3      # will install the latest version from Homebrew, including pip
 $ python3 --version
 Python 3.xx.x
 ```
@@ -22,7 +44,8 @@ Python 3.xx.x
 **2. Ensure next that `pip` is installed on the machine.**
 
 ```bash
-$ pip3 --version
+$ pip3 install --upgrade pip    # install latest version, mitigate package installation issues 
+$ pip3 --version                
 pip 23.2.1 from [...]
 ```
 if the above does not work, try:
@@ -31,24 +54,26 @@ $ python3 -m pip --version
 pip 23.2.1 from [...]
 ```
 
-If `pip` is not installed:
-
-```bash
-$ curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
-```
-
-```bash
-$ python3 get-pip.py
-```
-
 **3. Ensure next that `git` is installed on the machine.**
 ```bash
+$ brew install git                  # will install latest version of git
 $ git --version
-git version 2.xx.x (Apple Git-xxx)
+git version 2.xx.x 
 ```
 
-If git is not installed, a window will display prompting you to install the _command line developer tools_. Install it from within that window.
-![Window displaying command line developer tools install prompt](https://user-images.githubusercontent.com/8599/195653334-7fde0a5e-1168-4be4-b3a2-313c6bb836b8.png)
+**4. Ensure that `tkinter` is installed.**
+
+```bash
+$ brew install python-tk            # will install latest version of tkinter
+```
+
+**5. Ensure that `qt5` is installed**.
+
+This step may take a while; `--verbose` will print out each step of the process of installation so that it is able to be verified that `qt5` is indeed installing. [For reference, on an MacBook Air 15in with Apple M2 the progress took roughly 10-20 minutes to install.]
+
+```bash
+$ pip3 install --config-settings --confirm-license= --verbose  # will install latest version of qt5
+```
 
 ### Linux
 In Terminal, or your favourite terminal emulator:
@@ -81,6 +106,11 @@ If `git` is not installed:
 ```bash
 $ sudo apt-get update && sudo apt-get upgrade -y
 $ sudo apt-get install git -y
+```
+
+**3. Ensure that `tkinter` is installed.**
+```bash
+$ sudo apt-get install python-tk -y
 ```
 
 
@@ -138,7 +168,6 @@ $ git clone https://github.com/nathanphxm/Accelerometer-Analysis
 $ pip3 install -r requirements.txt
 ```
 
-
 ### Windows
 
 
@@ -156,7 +185,7 @@ Choose an option by typing it in the prompt.
 
 #### Using the graphical user interface (gui):
 ```bash
-Do you want to use the GUI or CLI? (gui/cli): cli
+Do you want to use the GUI or CLI? (gui/cli): gui
 ```
 A window will appear if all prerequisites were installed successfully.
 
