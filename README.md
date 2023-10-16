@@ -96,7 +96,7 @@ If `pip` is not installed:
 $ sudo apt-get update && sudo apt-get upgrade -y
 $ sudo apt-get install python3-pip -y
 ```
-**2. Ensure next that `git` is installed on the machine.**
+**3. Ensure next that `git` is installed on the machine.**
 ```bash
 $ git --version
 git version 2.3x.x
@@ -108,20 +108,71 @@ $ sudo apt-get update && sudo apt-get upgrade -y
 $ sudo apt-get install git -y
 ```
 
-**3. Ensure that `tkinter` is installed.**
+**4. Ensure that `tkinter` is installed.**
 ```bash
+$ sudo apt-get update && sudo apt-get upgrade -y
 $ sudo apt-get install python-tk -y
 ```
 
+**5. Ensure that `qt5` is installed**.
+
+```bash
+$ sudo apt-get update && sudo apt-get upgrade -y
+$ sudo apt install python3-pyqt5 -y
+```
 
 ### Windows
 In Terminal, or your favourite terminal emulator (Command Prompt may work!):
+
 **1. Ensure that Python 3.x is installed on the machine.**
 ```powershell
 $ python3 --version
 Python 3.xx.x
 ```
 Note: If Python 3.x is not currently installed on the system, a Microsoft Store window will open. Install it from that window.
+
+**2. Ensure next that `pip` is installed on the machine.**
+
+```powershell
+$ pip3 --version
+pip 23.x.x from [...]
+```
+
+**3. Ensure next that `git` is installed on the machine.**
+
+```powershell
+$ git --version
+git version 2.xx.x
+```
+
+If Git is not installed, install the command-line Git interface from: https://gitforwindows.org/. 
+
+Upon installation, make sure this setting is checked:
+
+![Select "Add a Git Bash Profile to Windows Terminal"](docs/gitforwindowsoption.png)
+
+The rest of the options can be left as default. 
+
+**4. Ensure that `tkinter` is installed.**
+
+Tkinter should be installed by default on Python installations on Windows.
+
+To ensure that it does work:
+```powershell
+$ python3               # launch Python 3.x shell
+```
+
+```python
+# in the Python shell
+>>> import tkinter      # after executing, there should not be an error
+>>> tkinter._test()     # should open a test window
+```
+
+**5. Ensure that `qt5` is installed**.
+
+Procedures to install `qt5` on Windows can be found here: https://doc.qt.io/qt-5/gettingstarted.html
+
+Please follow the steps as shown - sign up for an account and download the necessary installer for your machine(s). 
 
 ## Installing the software
 
@@ -132,7 +183,7 @@ Note: If Python 3.x is not currently installed on the system, a Microsoft Store 
 ```bash
 $ cd <path/to/dir>
 ```
-*To make it easier, you can do this:*
+*To make it easier, you can do this to get the folder path:*
 
 ![Drag a folder into a terminal window to reveal its path](docs/drag-for-path.gif)
 
@@ -159,6 +210,10 @@ $ python3 -m pip install -r requirements.txt
 ```bash
 $ cd <path/to/dir>
 ```
+
+*To make it easier, you can do this to get the folder path:*
+
+![Drag a folder into a terminal window to reveal its path](docs/linuxdragforpath.gif)
 3. Clone the repository into that folder
 ```bash
 $ git clone https://github.com/nathanphxm/Accelerometer-Analysis
@@ -170,7 +225,23 @@ $ pip3 install -r requirements.txt
 
 ### Windows
 
+1. Create an empty folder where you would like to store the program.
+2. Launch `Terminal` on your machine, and `cd` into that directory:
+```bash
+$ cd <path/to/dir>
+```
 
+*To make it easier, you can do this to get the folder path:*
+
+![Drag a folder into a terminal window to reveal its path](docs/windowsdragforpath.gif)
+3. Clone the repository into that folder
+```bash
+$ git clone https://github.com/nathanphxm/Accelerometer-Analysis
+```
+4. Install prerequisite Python packages
+```bash
+$ pip3 install -r requirements.txt
+```
 
 ## Using the software
 
