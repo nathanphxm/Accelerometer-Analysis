@@ -261,10 +261,20 @@ Do you want to use the GUI or CLI? (gui/cli): gui
 A window will appear if all prerequisites were installed successfully.
 
 1. Click "Load Data" and select a folder containing data to be analysed and visualised.
-2. Click "Set Start Date & Time" and "Set End Date & Time" to select the timeframe and click "OK".
-3. From the drop-down list, select a graph.
-4. Click "Print Data" to get the cleaned .csv file or click "Display Graph" to show graph.
 
+![Selecting data](docs/loadingfiles.gif)
+
+2. Click "Set Start Date & Time" and "Set End Date & Time" to select the timeframe and click "OK".
+
+![Selecting start/end date and time](docs/selectstartendtime.gif)
+
+3. From the drop-down list, select a graph, then click "Display Graph".
+
+![Displaying graph](docs/selectinggraph.gif)
+
+4. Click "Print Data" to get the cleaned and processed .csv file for further analysis.
+
+![Exporting .csv](docs/exportingcsv.gif)
 
 ---
 
