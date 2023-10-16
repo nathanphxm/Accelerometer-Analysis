@@ -28,7 +28,10 @@ DATE_FORMAT = None
 
 def styled_button(master, **kwargs):
     BUTTON_COLOR = "#3F51B5"
-    BUTTON_FOREGROUND = "#FFFFFF"
+    if sys.platform == "darwin":
+        BUTTON_FOREGROUND = "#000000"
+    else: 
+        BUTTON_FOREGROUND = "#FFFFFF"
     HOVER_COLOR = "#303F9F"
     #3F51B5
     
