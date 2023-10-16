@@ -296,6 +296,21 @@ class AppWindow(QMainWindow):
                     return
                 self.button2.setText(f"End Time: {selected_datetime.toString('yyyy-MM-dd HH:mm:ss')}")
 
+    def get_filtered_data(self):
+        """Filter accel_data based on the set start and end times."""
+        start_time_str = self.button1.text().replace("Start Time: ", "")
+        end_time_str = self.button2.text().replace("End Time: ", "")
+
+        # Convert string time to Unix timestamp
+        start_datetime = QDateTime.fromString(start_time_str, "yyyy-MM-dd HH:mm:ss")
+        end_datetime = QDateTime.fromString(end_time_str, "yyyy-MM-dd HH:mm:ss")
+
+        start_timestamp = start_datetime.toSecsSinceEpoch()
+        end_timestamp = end_datetime.toSecsSinceEpoch()
+
+        # Filter accel_data based on timestamp range
+        filtered_data = [row for row in self.accel_data if start_timestamp <= row[0] <= end_timestamp]
+        return filtered_data
 
     def display_graph(self):
         selected_script = self.dropdown.currentText()
@@ -305,7 +320,8 @@ class AppWindow(QMainWindow):
             spec = importlib.util.spec_from_file_location(selected_script, script_path)
             module = importlib.util.module_from_spec(spec)
             spec.loader.exec_module(module)
-            fig = module.plot_graph(self.accel_data)
+            filtered_data = self.get_filtered_data()
+            fig = module.plot_graph(filtered_data)
             
             # Update Canvas with the new figure
             self.canvas.set_figure(fig)
