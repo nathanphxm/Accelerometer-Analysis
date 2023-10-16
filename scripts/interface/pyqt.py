@@ -14,8 +14,10 @@ import matplotlib.dates as mdates
 class Canvas(FigureCanvas):
     def __init__(self, parent=None):
         fig = plt.figure(figsize=(5, 4), dpi=100)
+        
         super(Canvas, self).__init__(fig)
         self.ax = self.figure.add_subplot(111)
+        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
     def plot(self, fig):
         self.figure.clear()
@@ -92,16 +94,15 @@ class AppWindow(QMainWindow):
         self.button3.clicked.connect(self.display_graph)
         self.button4.clicked.connect(self.print_data)
 
-        # Ensure the label is at the top
-        self.layout.addWidget(self.loading_label, alignment=Qt.AlignTop)
-
-        # Add a spacer to push the remaining widgets to the bottom
-        self.layout.addItem(QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding))
-        
+        # UI setup adjustments
+        self.layout = QVBoxLayout()
+        self.layout.addWidget(self.canvas, 1)  # This will allow the canvas to expand and take available space
+        self.layout.addWidget(self.toolbar)
+        self.layout.addWidget(self.loading_label, alignment=Qt.AlignCenter)  # Moved label just above combobox
         self.layout.addWidget(self.dropdown)
         self.layout.addLayout(self.buttons_layout)
         self.layout.addWidget(self.load_data_button, alignment=Qt.AlignBottom)
-        
+
         self.main_widget.setLayout(self.layout)
 
     def populate_graph_scripts(self):
@@ -147,7 +148,19 @@ class AppWindow(QMainWindow):
             module = importlib.util.module_from_spec(spec)
             spec.loader.exec_module(module)
             fig = module.plot_graph(self.accel_data)
+            
+            # Update Canvas with the new figure
             self.canvas.set_figure(fig)
+
+            # Remove the existing toolbar
+            if hasattr(self, "toolbar"):
+                self.layout.removeWidget(self.toolbar)
+                self.toolbar.deleteLater()
+                self.toolbar = None
+            
+            # Create and add a new toolbar linked with the updated Canvas
+            self.toolbar = NavigationToolbar(self.canvas, self)
+            self.layout.insertWidget(2, self.toolbar)
 
     def print_data(self):
         if hasattr(self, 'accel_data') and self.accel_data is not None:
