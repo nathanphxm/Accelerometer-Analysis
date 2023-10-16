@@ -5,7 +5,7 @@ import importlib
 import csv
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QPushButton, QVBoxLayout, 
                              QWidget, QFileDialog, QLabel, QComboBox, QHBoxLayout, QSpacerItem, QSizePolicy)
-from PyQt5.QtCore import Qt, QDateTime, QTime
+from PyQt5.QtCore import Qt, QDateTime, QTime, QTimeZone
 from process_data import process_directory
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
@@ -29,9 +29,9 @@ class DateTimePicker(QDialog):
         self.minute_label = QLabel()
 
         self.datetime_type = datetime_type
-        self.min_datetime = min_datetime
-        self.max_datetime = max_datetime
-        self.current_datetime = current_datetime
+        self.min_datetime = min_datetime.addSecs(8 * 3600)  # Convert to GMT+8
+        self.max_datetime = max_datetime.addSecs(8 * 3600)  # Convert to GMT+8
+        self.current_datetime = current_datetime.addSecs(8 * 3600)  # Convert to GMT+8
         
         # Setup calendar
         self.calendar.setMinimumDate(self.min_datetime.date())
@@ -65,7 +65,8 @@ class DateTimePicker(QDialog):
         
         self.adjust_time_bounds(datetime_type)
         self.update_displayed_datetime()
-    
+  
+
     def adjust_time_bounds(self, datetime_type):
         selected_date = self.calendar.selectedDate()
         if datetime_type == "start":
@@ -110,8 +111,8 @@ class DateTimePicker(QDialog):
         hour = self.hour_slider.value()
         minute = self.minute_slider.value()
 
-        datetime_obj = QDateTime(date, QTime(hour, minute))
-        return datetime_obj
+        datetime_obj_gmt8 = QDateTime(date, QTime(hour, minute))
+        return datetime_obj_gmt8.addSecs(-8 * 3600)  # Convert back from GMT+8 to UTC
 
 class Canvas(FigureCanvas):
     def __init__(self, parent=None):
@@ -287,20 +288,22 @@ class AppWindow(QMainWindow):
 
             if result == QDialog.Accepted:
                 selected_datetime = dialog.get_selected_datetime()
+                displayed_datetime = selected_datetime.addSecs(8 * 3600)  # Convert to GMT+8 for display
+
                 if datetime_type == "start":
                     # Ensure that the new start time is before the current end time
                     current_end_time = QDateTime.fromString(self.button2.text().replace("End Time: ", ""), "yyyy-MM-dd HH:mm:ss") if "End Time:" in self.button2.text() else self.end_datetime
                     if selected_datetime >= current_end_time:
                         self.show_warning("Start time must be before the end time!")
                         return
-                    self.button1.setText(f"Start Time: {selected_datetime.toString('yyyy-MM-dd HH:mm:ss')}")
+                    self.button1.setText(f"Start Time: {displayed_datetime.toString('yyyy-MM-dd HH:mm:ss')}")
                 else:  # end
                     # Ensure that the new end time is after the current start time
                     current_start_time = QDateTime.fromString(self.button1.text().replace("Start Time: ", ""), "yyyy-MM-dd HH:mm:ss") if "Start Time:" in self.button1.text() else self.start_datetime
                     if selected_datetime <= current_start_time:
                         self.show_warning("End time must be after the start time!")
                         return
-                    self.button2.setText(f"End Time: {selected_datetime.toString('yyyy-MM-dd HH:mm:ss')}")
+                    self.button2.setText(f"End Time: {displayed_datetime.toString('yyyy-MM-dd HH:mm:ss')}")
         except Exception as e:
             self.show_warning(f"An error occurred while setting the datetime: {str(e)}")
 
