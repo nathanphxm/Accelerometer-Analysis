@@ -74,8 +74,15 @@ $ sudo apt-get install python3-pip -y
 **2. Ensure next that `git` is installed on the machine.**
 ```bash
 $ git --version
-$ 
+git version 2.3x.x
 ```
+If `git` is not installed:
+
+```bash
+$ sudo apt-get update && sudo apt-get upgrade -y
+$ sudo apt-get install git -y
+```
+
 
 ### Windows
 In Terminal, or your favourite terminal emulator (Command Prompt may work!):
@@ -147,14 +154,21 @@ Do you want to use the GUI or CLI? (gui/cli):
 
 Choose an option by typing it in the prompt. 
 
-#### Using the graphical user interface:
-1. Click "Load Data" and select the folder containing data you want to be analysed and visualised.
-2. Click "Set Start Date & Time" and "Set End Date & Time" to select the timeframe and click "OK".
-3. From the drop-down list, select the code respective to the graph you want to see.
-4. Click "Print Data" to get the cleaned csv file.
-5. Click "Display Graph" to show graph.
+#### Using the graphical user interface (gui):
+```bash
+Do you want to use the GUI or CLI? (gui/cli): cli
+```
+A window will appear if all prerequisites were installed successfully.
 
-#### Using the command-line interface:
+1. Click "Load Data" and select a folder containing data to be analysed and visualised.
+2. Click "Set Start Date & Time" and "Set End Date & Time" to select the timeframe and click "OK".
+3. From the drop-down list, select a graph.
+4. Click "Print Data" to get the cleaned .csv file or click "Display Graph" to show graph.
+
+
+---
+
+#### Using the command-line interface (cli):
 
 ```bash
 Do you want to use the GUI or CLI? (gui/cli): cli
@@ -169,15 +183,41 @@ Choose an option:
 
 Choose an option by entering `d` for directory analysis, `f` for individual file analysis or `e` to exit.
 
+---
+
 **Entering path for analysis:**
 
 Similar to above, you can drag in a folder or an individual file into the prompt.
 
 ![Drag a folder worth of data into the prompt](docs/drag-for-path-2.gif)
 
+If the directory exists and was read correctly, you will be prompted with:
+```bash
+[P]rint data to console, [E]xport data to CSV, [R]eturn to menu or e[X]it?
+```
+
+Choose an option by entering `p` to print data to console (terminal), `e` to export data to CSV, `r` to return to the main menu or `x` to exit out of the program entirely.
+
+---
+
+**Printing or exporting data:**
+
+You will be prompted with:
+```
+[A]ccelerometer data only or [G]PS data only?
+```
+
+If printing out to console, the chosen data will pipe out into the console. This may be useful for stringing into other terminal commands!
+
+If exporting as a .csv, the file will be found in the directory where `start.py` is located. 
+
+---
+
+### Troubleshooting
+More often than not, if there is an issue reading the file, please check for spaces in the full file path! The program can fail if there are erroneous spaces in the file path / directory names; please consider substituting spaces for underscores or copying files to a different location for processing and analysis.
 
 
-## Data visualisation
+## Data visualisation details
 
 ### Activity level based on frequency of movement (interface_activity_freq.py)
 [Approx running time: less than 10 seconds, if it takes longer than this, it might be an error in data file.] 
