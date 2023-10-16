@@ -212,19 +212,23 @@ class AppWindow(QMainWindow):
         self.main_widget.setLayout(self.layout)
 
     def populate_graph_scripts(self):
-        # Assuming the plotting directory is on the same level as interface and one directory up from current script
-        plotting_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "plotting")
+        try:
+            # Assuming the plotting directory is on the same level as interface and one directory up from current script
+            plotting_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "plotting")
 
-        # For each subdirectory in plotting, find python files
-        self.graph_scripts = {}
-        for subdir in os.listdir(plotting_dir):
-            sub_path = os.path.join(plotting_dir, subdir)
-            if os.path.isdir(sub_path):
-                for file in os.listdir(sub_path):
-                    if file.endswith('.py'):
-                        script_name = os.path.splitext(file)[0]
-                        self.graph_scripts[script_name] = os.path.join(sub_path, file)
-                        self.dropdown.addItem(script_name)
+            # For each subdirectory in plotting, find python files
+            self.graph_scripts = {}
+            for subdir in os.listdir(plotting_dir):
+                sub_path = os.path.join(plotting_dir, subdir)
+                if os.path.isdir(sub_path):
+                    for file in os.listdir(sub_path):
+                        if file.endswith('.py'):
+                            script_name = os.path.splitext(file)[0]
+                            self.graph_scripts[script_name] = os.path.join(sub_path, file)
+                            self.dropdown.addItem(script_name)
+
+        except Exception as e:
+            self.show_warning(f"An error occurred while loading graph scripts: {str(e)}")
 
     def load_data(self):
         directory = QFileDialog.getExistingDirectory(self, "Select Directory")
@@ -251,112 +255,134 @@ class AppWindow(QMainWindow):
                 self.end_datetime = QDateTime.fromSecsSinceEpoch(end_timestamp)
 
             except Exception as e:
-                print(f"An error occurred: {str(e)}")
+                self.show_warning(f"An error occurred: {str(e)}")
 
     def set_datetime(self, datetime_type):
-        # Convert integer timestamp to QDateTime object
-        if isinstance(self.accel_data[0][0], int):
-            # If timestamp is seconds since the Unix epoch
-            start_datetime = QDateTime.fromSecsSinceEpoch(self.accel_data[0][0])
-            end_datetime = QDateTime.fromSecsSinceEpoch(self.accel_data[-1][0])
-        else:
-            # Assuming the first element of each data row is a timestamp string
-            start_datetime = QDateTime.fromString(self.accel_data[0][0], "yyyy-MM-dd HH:mm:ss")
-            end_datetime = QDateTime.fromString(self.accel_data[-1][0], "yyyy-MM-dd HH:mm:ss")
+        try:
+            # Convert integer timestamp to QDateTime object
+            if isinstance(self.accel_data[0][0], int):
+                # If timestamp is seconds since the Unix epoch
+                start_datetime = QDateTime.fromSecsSinceEpoch(self.accel_data[0][0])
+                end_datetime = QDateTime.fromSecsSinceEpoch(self.accel_data[-1][0])
+            else:
+                # Assuming the first element of each data row is a timestamp string
+                start_datetime = QDateTime.fromString(self.accel_data[0][0], "yyyy-MM-dd HH:mm:ss")
+                end_datetime = QDateTime.fromString(self.accel_data[-1][0], "yyyy-MM-dd HH:mm:ss")
 
-        # Determine the minimum and maximum allowable datetime based on the other button and the data range
-        if datetime_type == "start":
-            min_datetime = start_datetime
-            max_datetime = QDateTime.fromString(self.button2.text().replace("End Time: ", ""), "yyyy-MM-dd HH:mm:ss") if "End Time:" in self.button2.text() else end_datetime
-        else: # end
-            max_datetime = end_datetime
-            min_datetime = QDateTime.fromString(self.button1.text().replace("Start Time: ", ""), "yyyy-MM-dd HH:mm:ss") if "Start Time:" in self.button1.text() else start_datetime
-
-        if datetime_type == "start":
-            current_datetime = self.start_datetime
-        elif datetime_type == "end":
-            current_datetime = self.end_datetime
-
-        dialog = DateTimePicker(datetime_type, min_datetime, max_datetime, current_datetime, self)
-        result = dialog.exec_()
-
-        if result == QDialog.Accepted:
-            selected_datetime = dialog.get_selected_datetime()
+            # Determine the minimum and maximum allowable datetime based on the other button and the data range
             if datetime_type == "start":
-                # Ensure that the new start time is before the current end time
-                current_end_time = QDateTime.fromString(self.button2.text().replace("End Time: ", ""), "yyyy-MM-dd HH:mm:ss") if "End Time:" in self.button2.text() else self.end_datetime
-                if selected_datetime >= current_end_time:
-                    self.show_warning("Start time must be before the end time!")
-                    return
-                self.button1.setText(f"Start Time: {selected_datetime.toString('yyyy-MM-dd HH:mm:ss')}")
-            else:  # end
-                # Ensure that the new end time is after the current start time
-                current_start_time = QDateTime.fromString(self.button1.text().replace("Start Time: ", ""), "yyyy-MM-dd HH:mm:ss") if "Start Time:" in self.button1.text() else self.start_datetime
-                if selected_datetime <= current_start_time:
-                    self.show_warning("End time must be after the start time!")
-                    return
-                self.button2.setText(f"End Time: {selected_datetime.toString('yyyy-MM-dd HH:mm:ss')}")
+                min_datetime = start_datetime
+                max_datetime = QDateTime.fromString(self.button2.text().replace("End Time: ", ""), "yyyy-MM-dd HH:mm:ss") if "End Time:" in self.button2.text() else end_datetime
+            else: # end
+                max_datetime = end_datetime
+                min_datetime = QDateTime.fromString(self.button1.text().replace("Start Time: ", ""), "yyyy-MM-dd HH:mm:ss") if "Start Time:" in self.button1.text() else start_datetime
+
+            if datetime_type == "start":
+                current_datetime = self.start_datetime
+            elif datetime_type == "end":
+                current_datetime = self.end_datetime
+
+            dialog = DateTimePicker(datetime_type, min_datetime, max_datetime, current_datetime, self)
+            result = dialog.exec_()
+
+            if result == QDialog.Accepted:
+                selected_datetime = dialog.get_selected_datetime()
+                if datetime_type == "start":
+                    # Ensure that the new start time is before the current end time
+                    current_end_time = QDateTime.fromString(self.button2.text().replace("End Time: ", ""), "yyyy-MM-dd HH:mm:ss") if "End Time:" in self.button2.text() else self.end_datetime
+                    if selected_datetime >= current_end_time:
+                        self.show_warning("Start time must be before the end time!")
+                        return
+                    self.button1.setText(f"Start Time: {selected_datetime.toString('yyyy-MM-dd HH:mm:ss')}")
+                else:  # end
+                    # Ensure that the new end time is after the current start time
+                    current_start_time = QDateTime.fromString(self.button1.text().replace("Start Time: ", ""), "yyyy-MM-dd HH:mm:ss") if "Start Time:" in self.button1.text() else self.start_datetime
+                    if selected_datetime <= current_start_time:
+                        self.show_warning("End time must be after the start time!")
+                        return
+                    self.button2.setText(f"End Time: {selected_datetime.toString('yyyy-MM-dd HH:mm:ss')}")
+        except Exception as e:
+            self.show_warning(f"An error occurred while setting the datetime: {str(e)}")
 
     def get_filtered_data(self):
-        """Filter accel_data based on the set start and end times."""
-        start_time_str = self.button1.text().replace("Start Time: ", "")
-        end_time_str = self.button2.text().replace("End Time: ", "")
+        try:
+            """Filter accel_data based on the set start and end times."""
+            start_time_str = self.button1.text().replace("Start Time: ", "")
+            end_time_str = self.button2.text().replace("End Time: ", "")
 
-        # Convert string time to Unix timestamp
-        start_datetime = QDateTime.fromString(start_time_str, "yyyy-MM-dd HH:mm:ss")
-        end_datetime = QDateTime.fromString(end_time_str, "yyyy-MM-dd HH:mm:ss")
+            # Convert string time to Unix timestamp
+            start_datetime = QDateTime.fromString(start_time_str, "yyyy-MM-dd HH:mm:ss")
+            end_datetime = QDateTime.fromString(end_time_str, "yyyy-MM-dd HH:mm:ss")
 
-        start_timestamp = start_datetime.toSecsSinceEpoch()
-        end_timestamp = end_datetime.toSecsSinceEpoch()
+            start_timestamp = start_datetime.toSecsSinceEpoch()
+            end_timestamp = end_datetime.toSecsSinceEpoch()
 
-        # Filter accel_data based on timestamp range
-        filtered_data = [row for row in self.accel_data if start_timestamp <= row[0] <= end_timestamp]
-        return filtered_data
+            # Filter accel_data based on timestamp range
+            filtered_data = [row for row in self.accel_data if start_timestamp <= row[0] <= end_timestamp]
+            return filtered_data
+        except Exception as e:
+            self.show_warning(f"An error occurred while filtering the data: {str(e)}")
 
     def display_graph(self):
+        # Check if start and end datetime are selected based on button text
+        if self.button1.text() == "Start Time" or self.button2.text() == "End Time":
+            self.show_warning("Please select both start and end datetime!")
+            return
+
+        # Check if a valid graph type is selected
+        if self.dropdown.currentText() == "Select Graph Type":
+            self.show_warning("Please select a valid graph type!")
+            return
+
         selected_script = self.dropdown.currentText()
         if selected_script and hasattr(self, 'accel_data') and self.accel_data is not None:
-            # Import the module dynamically and call the plot_graph function with data
-            script_path = self.graph_scripts[selected_script]
-            spec = importlib.util.spec_from_file_location(selected_script, script_path)
-            module = importlib.util.module_from_spec(spec)
-            spec.loader.exec_module(module)
-            filtered_data = self.get_filtered_data()
-            fig = module.plot_graph(filtered_data)
-            
-            # Update Canvas with the new figure
-            self.canvas.set_figure(fig)
+            try:
+                # Import the module dynamically and call the plot_graph function with data
+                script_path = self.graph_scripts[selected_script]
+                spec = importlib.util.spec_from_file_location(selected_script, script_path)
+                module = importlib.util.module_from_spec(spec)
+                spec.loader.exec_module(module)
+                filtered_data = self.get_filtered_data()
+                fig = module.plot_graph(filtered_data)
+                
+                # Update Canvas with the new figure
+                self.canvas.set_figure(fig)
 
-            # Remove the existing toolbar
-            if hasattr(self, "toolbar"):
-                self.layout.removeWidget(self.toolbar)
-                self.toolbar.deleteLater()
-                self.toolbar = None
-            
-            # Create and add a new toolbar linked with the updated Canvas
-            self.toolbar = NavigationToolbar(self.canvas, self)
-            self.layout.insertWidget(2, self.toolbar)
+                # Remove the existing toolbar
+                if hasattr(self, "toolbar"):
+                    self.layout.removeWidget(self.toolbar)
+                    self.toolbar.deleteLater()
+                    self.toolbar = None
+                
+                # Create and add a new toolbar linked with the updated Canvas
+                self.toolbar = NavigationToolbar(self.canvas, self)
+                self.layout.insertWidget(2, self.toolbar)
+
+            except Exception as e:
+               self.show_warning(f"An error occurred while displaying the graph: {str(e)}")
 
     def print_data(self):
         if hasattr(self, 'accel_data') and self.accel_data is not None:
-            # Open a file dialog for the user to select the save location
-            data_to_write = self.get_filtered_data()
-            options = QFileDialog.Options()
-            fileName, _ = QFileDialog.getSaveFileName(self, "Save CSV File", "", "CSV Files (*.csv);;All Files (*)", options=options)
-            if fileName:
-                # Check if the file has the correct extension
-                if not fileName.endswith('.csv'):
-                    fileName += '.csv'
-                
-                # Use the csv.writer to write the header and data
-                with open(fileName, mode='w', newline='') as file:
-                    writer = csv.writer(file)
-                    writer.writerow(["TIMESTAMP", "INTERVAL", "X_ACCEL", "Y_ACCEL", "Z_ACCEL"])
-                    writer.writerows(data_to_write)
+            try:
+                # Open a file dialog for the user to select the save location
+                data_to_write = self.get_filtered_data()
+                options = QFileDialog.Options()
+                fileName, _ = QFileDialog.getSaveFileName(self, "Save CSV File", "", "CSV Files (*.csv);;All Files (*)", options=options)
+                if fileName:
+                    # Check if the file has the correct extension
+                    if not fileName.endswith('.csv'):
+                        fileName += '.csv'
+                    
+                    # Use the csv.writer to write the header and data
+                    with open(fileName, mode='w', newline='') as file:
+                        writer = csv.writer(file)
+                        writer.writerow(["TIMESTAMP", "INTERVAL", "X_ACCEL", "Y_ACCEL", "Z_ACCEL"])
+                        writer.writerows(data_to_write)
 
-                QMessageBox.information(self, "Info", "Data exported successfully!")
-        else:
-            print("No data loaded.")
+                    QMessageBox.information(self, "Info", "Data exported successfully!")
+           
+            except Exception as e:
+                self.show_warning(f"An error occurred while saving the data: {str(e)}")
 
     def show_warning(self, message):
         """Show a warning message to the user."""
